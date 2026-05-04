@@ -3,7 +3,7 @@ const fs = require('fs/promises');
 const path = require('path');
 const { URL } = require('url');
 
-const PORT = Number(process.env.PORT || 3000);
+const PORT = Number(process.env.PORT || 80);
 const ROOT_DIR = __dirname;
 const HOMEWORK_DIR = path.join(ROOT_DIR, 'homework');
 const DATA_DIR = path.join(ROOT_DIR, 'data');
