@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>余跃语文背诵任务</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%);
+    min-height: 100vh;
+    padding: 20px;
+    color: #333;
+  }
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+    padding: 32px;
+  }
+  h1 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 8px;
+    font-size: 28px;
+  }
+  .subtitle {
+    text-align: center;
+    color: #7f8c8d;
+    margin-bottom: 24px;
+    font-size: 14px;
+  }
+
+  /* 章节选择 */
+  .chapters {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .chapter-card {
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: #fafafa;
+    user-select: none;
+  }
+  .chapter-card:hover {
+    border-color: #3498db;
+    transform: translateY(-2px);
+  }
+  .chapter-card.active {
+    border-color: #3498db;
+    background: #eaf4fc;
+  }
+  .chapter-card .num {
+    font-weight: bold;
+    color: #3498db;
+    font-size: 14px;
+  }
+  .chapter-card .title {
+    font-size: 16px;
+    margin-top: 4px;
+    color: #2c3e50;
+  }
+  .chapter-card .count {
+    font-size: 12px;
+    color: #95a5a6;
+    margin-top: 2px;
+  }
+
+  /* 控制面板 */
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 16px;
+    background: #f8f9fa;
+    border-radius: 10px;
+  }
+  .controls label {
+    font-size: 14px;
+    color: #555;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .controls input[type="number"] {
+    width: 60px;
+    padding: 6px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+  }
+  .controls select {
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: white;
+  }
+  .btn {
+    padding: 10px 22px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 500;
+  }
+  .btn-primary {
+    background: #3498db;
+    color: white;
+  }
+  .btn-primary:hover { background: #2980b9; }
+  .btn-primary:disabled { background: #bdc3c7; cursor: not-allowed; }
+  .btn-secondary {
+    background: #ecf0f1;
+    color: #333;
+  }
+  .btn-secondary:hover { background: #d5dbdb; }
+  .btn-danger {
+    background: #e74c3c;
+    color: white;
+  }
+  .btn-danger:hover { background: #c0392b; }
+
+  /* 背诵区 */
+  .dictation-area {
+    text-align: center;
+    padding: 40px 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    color: white;
+    margin-bottom: 20px;
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .progress-text {
+    font-size: 16px;
+    opacity: 0.9;
+    margin-bottom: 12px;
+  }
+  .current-word {
+    font-size: 52px;
+    font-weight: bold;
+    letter-spacing: 8px;
+    margin-bottom: 16px;
+    min-height: 70px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+  }
+  .current-word.hidden { color: transparent; text-shadow: none; }
+  .hint {
+    font-size: 14px;
+    opacity: 0.85;
+    background: rgba(255,255,255,0.15);
+    padding: 8px 16px;
+    border-radius: 20px;
+  }
+  .progress-bar {
+    width: 100%;
+    max-width: 400px;
+    height: 6px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 3px;
+    margin-top: 20px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: white;
+    transition: width 0.3s;
+    width: 0%;
+  }
+
+  /* 词语列表（结果回顾） */
+  .word-list {
+    margin-top: 20px;
+    padding: 16px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  .word-list h3 {
+    margin-bottom: 10px;
+    color: #2c3e50;
+    font-size: 16px;
+  }
+  .word-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .word-tag {
+    padding: 6px 12px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 15px;
+  }
+  .word-tag.done { background: #d5f5e3; border-color: #82e0aa; }
+  .word-tag.current { background: #fff3cd; border-color: #ffc107; font-weight: bold; }
+
+  .chapter-group {
+    margin-top: 14px;
+    padding: 10px 12px;
+    background: white;
+    border-radius: 8px;
+    border-left: 3px solid #3498db;
+  }
+  .chapter-group:first-of-type { margin-top: 10px; }
+  .chapter-group-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .chapter-group-count {
+    font-size: 12px;
+    color: #7f8c8d;
+    font-weight: normal;
+    background: #ecf0f1;
+    padding: 2px 8px;
+    border-radius: 10px;
+  }
+
+  .empty-tip {
+    text-align: center;
+    color: #95a5a6;
+    padding: 20px;
+  }
+
+  @media (max-width: 600px) {
+    .container { padding: 16px; }
+    .current-word { font-size: 38px; letter-spacing: 4px; }
+    h1 { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>📚 余跃语文背诵任务</h1>
+  <p class="subtitle">选择章节 → 开始背诵 → 按 <b>空格</b> 读下一项</p>
+
+  <h3 style="margin-bottom:10px;color:#34495e;">选择章节（可多选）：</h3>
+  <div class="chapters" id="chapters"></div>
+
+  <div class="controls">
+    <label>语速
+      <input type="range" id="rate" min="0.5" max="1.5" step="0.1" value="0.8" />
+      <span id="rateVal">0.8</span>
+    </label>
+    <label>
+      <input type="checkbox" id="shuffle" /> 乱序
+    </label>
+    <label>
+      <input type="checkbox" id="showWord" /> 显示内容（背诵提示）
+    </label>
+    <button class="btn btn-primary" id="startBtn">开始背诵</button>
+    <button class="btn btn-secondary" id="replayBtn" disabled>重读 (R)</button>
+    <button class="btn btn-secondary" id="testBtn">🔊 测试语音</button>
+    <button class="btn btn-danger" id="stopBtn" disabled>结束</button>
+  </div>
+
+  <div id="voiceStatus" style="font-size:12px;color:#7f8c8d;margin-bottom:10px;text-align:center;"></div>
+
+  <div class="dictation-area" id="dictArea">
+    <div class="progress-text" id="progressText">请选择章节后开始背诵</div>
+    <div class="current-word hidden" id="currentWord">—</div>
+    <div class="hint">按 <b>空格</b> 下一个 &nbsp;|&nbsp; 按 <b>R</b> 重读</div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+
+  <div class="word-list" id="wordList">
+    <div class="empty-tip">暂未开始背诵</div>
+  </div>
+</div>
+
+<script>
+// 章节数据 —— 根据图片整理
+const CHAPTERS = {
+  1: { title: "渔翁", words: ["渔翁", "鸟笼", "依赖", "剥夺", "茅屋", "疏散", "依偎"] },
+  2: { title: "屋檐", words: ["屋檐", "构成", "装饰", "顺序", "华丽", "独特", "照例", "率领", "踏步", "倘若", "和谐", "催眠曲", "甜蜜", "梦乡"] },
+  3: { title: "慰藉", words: ["慰藉", "扫荡", "威力", "锐利", "河滩", "帐子", "闪烁", "奇幻", "蝙蝠", "霸气", "猫头鹰", "复杂"] },
+  5: { title: "怒吼", words: ["怒吼", "松脂", "拂拭", "灰尘", "美餐", "晌午", "热辣辣", "淹没", "挣扎", "成千上万", "冲刷", "断绝", "推测", "详细", "情形", "划动", "三番五次", "埋没", "掩埋"] },
+  6: { title: "恐龙", words: ["恐龙", "笨重", "迟钝", "鸽子", "凌空", "根据", "末期", "描绘", "隧道", "地球", "形态", "膨大", "前肢", "具备", "开辟", "脱离", "毫厘", "千吨", "脑颅", "羽翼"] },
+  7: { title: "纳米", words: ["纳米", "无能为力", "拥有", "冰箱", "功能", "蔬菜", "材料", "钢铁", "隐形", "健康", "细胞", "疾病", "预防", "病灶", "需要", "深刻", "臭味", "低碳生活", "碳黑"] },
+  9: { title: "繁星", words: ["繁星", "藤萝", "波涛", "漫灭", "膝盖", "躲避"] },
+  10: { title: "墨绿", words: ["墨绿", "嫩绿", "集中", "交叉", "教练", "指挥", "整齐"] },
+  11: { title: "白桦", words: ["毛茸茸", "潇洒", "朦胧", "寂静", "朝霞"] },
+  13: { title: "呼唤", words: ["响动", "尽职", "屏息", "稿纸", "梅花", "解闷", "勇猛", "满月", "淘气"] },
+  14: { title: "讨厌", words: ["理由", "心事", "反抗", "忠厚", "毒手", "成绩", "警戒", "预备", "汤圆"] },
+  15: { title: "即将", words: ["姿态", "高傲", "音调", "局促", "京剧", "一丝不苟", "譬如", "侍候", "饭馆", "附近", "脾气", "敏捷", "空空如也", "昂首", "供养"] },
+  16: { title: "清静", words: ["扩大", "范围", "努力", "刹那", "夺目", "分辨", "灿烂", "不仅"] },
+  17: { title: "杜鹃", words: ["气势", "聚集", "拥挤", "心情", "脚跟", "移动", "昏暗", "挤压", "额角", "登陆", "宽广", "石钟乳", "石笋", "观赏"] },
+  19: { title: "芦花", words: ["发愣", "铅笔", "摇晃", "胳膊", "劫难", "鬼脸", "戒指", "绸子", "敌人", "尸首", "防备", "慌忙"] },
+  23: { title: "战场", words: ["节拍", "持续", "命令", "占领", "射击", "突击", "枪弹", "愤怒", "注视", "光荣", "艰巨", "消息", "炮弹", "爆炸", "烈火", "子弹", "不料", "规定", "惊天动地", "消灭"] },
+  24: { title: "行驶", words: ["行驶", "凌晨", "窟窿", "混乱", "维持", "秩序", "岗位", "主宰", "调遣", "践行"] },
+  26: { title: "介绍", words: ["介绍", "声明", "妖怪", "规矩", "劈面", "幸福", "向日葵"] },
+  27: { title: "柔嫩", words: ["柔嫩", "丰硕", "允许", "禁止", "踪迹", "呼啸", "始终", "吼叫", "自私", "举动", "脸颊", "凶狠", "拆除"] }
+};
+
+// DOM
+const chaptersEl = document.getElementById('chapters');
+const startBtn = document.getElementById('startBtn');
+const stopBtn = document.getElementById('stopBtn');
+const replayBtn = document.getElementById('replayBtn');
+const currentWordEl = document.getElementById('currentWord');
+const progressTextEl = document.getElementById('progressText');
+const progressFillEl = document.getElementById('progressFill');
+const wordListEl = document.getElementById('wordList');
+const rateInput = document.getElementById('rate');
+const rateVal = document.getElementById('rateVal');
+const shuffleInput = document.getElementById('shuffle');
+const showWordInput = document.getElementById('showWord');
+
+// 状态
+let selectedChapters = new Set();
+let queue = [];
+let currentIdx = -1;
+let running = false;
+
+// 渲染章节卡片
+function renderChapters() {
+  chaptersEl.innerHTML = '';
+  Object.keys(CHAPTERS).forEach(num => {
+    const ch = CHAPTERS[num];
+    const el = document.createElement('div');
+    el.className = 'chapter-card';
+    el.dataset.num = num;
+    el.innerHTML = `
+      <div class="num">第 ${num} 课</div>
+      <div class="title">${ch.title}</div>
+      <div class="count">${ch.words.length} 个词</div>
+    `;
+    el.addEventListener('click', () => {
+      if (running) return;
+      if (selectedChapters.has(num)) {
+        selectedChapters.delete(num);
+        el.classList.remove('active');
+      } else {
+        selectedChapters.add(num);
+        el.classList.add('active');
+      }
+    });
+    chaptersEl.appendChild(el);
+  });
+}
+renderChapters();
+
+rateInput.addEventListener('input', () => rateVal.textContent = rateInput.value);
+
+// ==== 语音初始化 ====
+let voicesCache = [];
+let voicesReady = false;
+
+function loadVoices() {
+  return new Promise(resolve => {
+    const v = window.speechSynthesis.getVoices();
+    if (v && v.length) {
+      voicesCache = v;
+      voicesReady = true;
+      resolve(v);
+      return;
+    }
+    // 监听 voiceschanged 事件
+    const handler = () => {
+      voicesCache = window.speechSynthesis.getVoices();
+      voicesReady = true;
+      window.speechSynthesis.removeEventListener('voiceschanged', handler);
+      resolve(voicesCache);
+    };
+    window.speechSynthesis.addEventListener('voiceschanged', handler);
+    // 超时兜底（部分浏览器不触发事件）
+    setTimeout(() => {
+      if (!voicesReady) {
+        voicesCache = window.speechSynthesis.getVoices();
+        voicesReady = true;
+        resolve(voicesCache);
+      }
+    }, 1500);
+  });
+}
+
+// 朗读
+function speak(text) {
+  if (!('speechSynthesis' in window)) {
+    alert('您的浏览器不支持语音合成，请使用 Chrome/Edge/Safari');
+    return;
+  }
+  // Chrome bug：长时间未使用时 speaking/pending 状态异常，先 resume
+  try { window.speechSynthesis.resume(); } catch(e) {}
+  window.speechSynthesis.cancel();
+
+  const doSpeak = () => {
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'zh-CN';
+    u.rate = parseFloat(rateInput.value);
+    u.pitch = 1;
+    u.volume = 1;
+    // 优先中文声音
+    const voices = voicesCache.length ? voicesCache : window.speechSynthesis.getVoices();
+    const zh = voices.find(v => /zh|cmn|Chinese/i.test(v.lang) || /Chinese|中文|普通话|Tingting|Mei-Jia|Sin-ji/i.test(v.name));
+    if (zh) u.voice = zh;
+    u.onerror = (e) => {
+      console.warn('Speech error:', e);
+      // 某些情况下错误是 interrupted，可忽略
+      if (e.error && e.error !== 'interrupted' && e.error !== 'canceled') {
+        progressTextEl.textContent = '⚠️ 朗读出错：' + e.error + '（请检查系统是否安装中文语音）';
+      }
+    };
+    u.onend = () => {
+      // Chrome 长句子限制 workaround
+    };
+    window.speechSynthesis.speak(u);
+  };
+
+  if (!voicesReady) {
+    loadVoices().then(doSpeak);
+  } else {
+    // 轻微延迟，规避 cancel 后立即 speak 被吞的问题
+    setTimeout(doSpeak, 80);
+  }
+}
+
+// Chrome 长时间运行会自动暂停，每隔一段时间 resume 一次
+setInterval(() => {
+  if ('speechSynthesis' in window && window.speechSynthesis.speaking) {
+    window.speechSynthesis.pause();
+    window.speechSynthesis.resume();
+  }
+}, 8000);
+
+// 开始
+startBtn.addEventListener('click', () => {
+  if (selectedChapters.size === 0) {
+    alert('请先选择至少一个章节');
+    return;
+  }
+  // 按章节顺序构建词语列表
+  const nums = [...selectedChapters].sort((a,b)=>parseInt(a)-parseInt(b));
+  queue = [];
+  nums.forEach(n => {
+    CHAPTERS[n].words.forEach(w => queue.push({ word: w, chapter: n }));
+  });
+  if (shuffleInput.checked) {
+    for (let i = queue.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [queue[i], queue[j]] = [queue[j], queue[i]];
+    }
+  }
+
+  running = true;
+  currentIdx = -1;
+  startBtn.disabled = true;
+  stopBtn.disabled = false;
+  replayBtn.disabled = false;
+  renderWordList();
+  nextWord();
+});
+
+// 结束
+stopBtn.addEventListener('click', () => endDictation(false));
+replayBtn.addEventListener('click', () => {
+  if (currentIdx >= 0 && currentIdx < queue.length) speak(queue[currentIdx].word);
+});
+
+function endDictation(finished) {
+  running = false;
+  window.speechSynthesis.cancel();
+  startBtn.disabled = false;
+  stopBtn.disabled = true;
+  replayBtn.disabled = true;
+  if (finished) {
+    progressTextEl.textContent = `🎉 背诵完成！共 ${queue.length} 个词`;
+    currentWordEl.textContent = '✓ 完成';
+    currentWordEl.classList.remove('hidden');
+  } else {
+    progressTextEl.textContent = '已结束';
+  }
+}
+
+function nextWord() {
+  currentIdx++;
+  if (currentIdx >= queue.length) {
+    progressFillEl.style.width = '100%';
+    endDictation(true);
+    renderWordList();
+    return;
+  }
+  const item = queue[currentIdx];
+  progressTextEl.textContent = `第 ${currentIdx + 1} / ${queue.length} 个 · 来自第 ${item.chapter} 课《${CHAPTERS[item.chapter].title}》`;
+  if (showWordInput.checked) {
+    currentWordEl.textContent = item.word;
+    currentWordEl.classList.remove('hidden');
+  } else {
+    currentWordEl.textContent = '● ● ●';
+    currentWordEl.classList.add('hidden');
+  }
+  progressFillEl.style.width = `${((currentIdx + 1) / queue.length) * 100}%`;
+  renderWordList();
+  // 稍微延迟朗读，避免按键冲突
+  setTimeout(() => speak(item.word), 150);
+}
+
+function renderWordList() {
+  if (queue.length === 0) {
+    wordListEl.innerHTML = '<div class="empty-tip">暂未开始背诵</div>';
+    return;
+  }
+  // 按章节分组
+  const groups = {};
+  const order = [];
+  queue.forEach((item, i) => {
+    if (!groups[item.chapter]) {
+      groups[item.chapter] = [];
+      order.push(item.chapter);
+    }
+    groups[item.chapter].push({ ...item, globalIdx: i });
+  });
+
+  const groupsHtml = order.map(ch => {
+    const items = groups[ch];
+    const doneCount = items.filter(x => x.globalIdx < currentIdx).length;
+    const total = items.length;
+    const tags = items.map(x => {
+      let cls = 'word-tag';
+      if (x.globalIdx < currentIdx) cls += ' done';
+      else if (x.globalIdx === currentIdx) cls += ' current';
+      const display = (x.globalIdx < currentIdx || !running) ? x.word : '？';
+      return `<span class="${cls}">${display}</span>`;
+    }).join('');
+    return `
+      <div class="chapter-group">
+        <div class="chapter-group-title">第 ${ch} 课《${CHAPTERS[ch].title}》<span class="chapter-group-count">${doneCount}/${total}</span></div>
+        <div class="word-tags">${tags}</div>
+      </div>
+    `;
+  }).join('');
+
+  wordListEl.innerHTML = `<h3>背诵进度（共 ${queue.length} 个）</h3>${groupsHtml}`;
+}
+
+// 快捷键
+document.addEventListener('keydown', (e) => {
+  if (!running) return;
+  if (e.code === 'Space') {
+    e.preventDefault();
+    nextWord();
+  } else if (e.key === 'r' || e.key === 'R') {
+    e.preventDefault();
+    if (currentIdx >= 0 && currentIdx < queue.length) speak(queue[currentIdx].word);
+  }
+});
+
+// 预加载声音列表
+if ('speechSynthesis' in window) {
+  loadVoices().then(vs => {
+    const zhVoices = vs.filter(v => /zh|cmn|Chinese/i.test(v.lang));
+    const status = document.getElementById('voiceStatus');
+    if (zhVoices.length) {
+      status.textContent = `✅ 已就绪，检测到 ${zhVoices.length} 个中文语音：${zhVoices.map(v=>v.name).slice(0,3).join('、')}`;
+    } else {
+      status.innerHTML = `⚠️ 未检测到中文语音！请在系统设置中安装中文 TTS 语音包（Mac：系统设置→辅助功能→朗读内容→系统嗓音→管理嗓音 添加"婷婷/Sin-ji"等）`;
+      status.style.color = '#e67e22';
+    }
+  });
+  // 首次用户点击时做一次"静默唤醒"，解锁语音权限
+  const unlock = () => {
+    try {
+      const u = new SpeechSynthesisUtterance('');
+      u.volume = 0;
+      window.speechSynthesis.speak(u);
+    } catch(e) {}
+    document.removeEventListener('click', unlock);
+  };
+  document.addEventListener('click', unlock);
+} else {
+  document.getElementById('voiceStatus').textContent = '❌ 当前浏览器不支持语音合成，请使用 Chrome/Edge/Safari';
+}
+
+// 测试按钮
+document.getElementById('testBtn').addEventListener('click', () => {
+  speak('你好，这是语音测试');
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>余跃进制转换</title>
+<link rel="stylesheet" href="/shared/base-conversion-task.css" />
+</head>
+<body>
+<div class="page">
+  <section class="hero">
+    <div>
+      <div class="eyebrow">数学专项 · 进制转换</div>
+      <h1 id="title">进制转换</h1>
+      <p class="subtitle" id="subtitle"></p>
+    </div>
+    <div class="score-card">
+      <div class="score-number" id="score">0/12</div>
+      <div class="score-label">当前得分</div>
+    </div>
+  </section>
+
+  <section class="toolbar">
+    <div class="tips">答案中十六进制可使用大写或小写，例如 <b>FF</b> / <b>ff</b> 都可以。填写内容会在当前浏览器会话中自动保留。</div>
+  </section>
+
+  <section class="question-grid" id="questionGrid"></section>
+
+  <section class="bottom-actions">
+    <div class="save-status" id="saveStatus"></div>
+    <div class="actions">
+      <button class="btn btn-primary" id="checkBtn">批改</button>
+      <button class="btn btn-secondary" id="resetBtn">重做</button>
+      <button class="btn btn-secondary" id="saveBtn" disabled>保存成绩</button>
+    </div>
+  </section>
+</div>
+
+<script>
+window.BASE_CONVERSION_TASK = {
+  childId: 'yuyue',
+  childName: '余跃',
+  questions: [
+    { fromBase: 10, toBase: 5, value: '42', answer: '132' },
+    { fromBase: 10, toBase: 16, value: '73', answer: '49' },
+    { fromBase: 5, toBase: 10, value: '314', answer: '84' },
+    { fromBase: 16, toBase: 10, value: '2F', answer: '47' },
+    { fromBase: 5, toBase: 16, value: '204', answer: '36' },
+    { fromBase: 16, toBase: 5, value: '3A', answer: '213' },
+    { fromBase: 10, toBase: 5, value: '128', answer: '1003' },
+    { fromBase: 10, toBase: 16, value: '255', answer: 'FF' },
+    { fromBase: 5, toBase: 10, value: '432', answer: '117' },
+    { fromBase: 16, toBase: 10, value: '7B', answer: '123' },
+    { fromBase: 5, toBase: 16, value: '1204', answer: 'B3' },
+    { fromBase: 16, toBase: 5, value: '9C', answer: '1111' }
+  ]
+};
+</script>
+<script src="/shared/base-conversion-task.js"></script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "name": "smartway-homework",
+  "version": "0.1.0",
+  "private": true,
+  "description": "SmartWay 家庭作业跟踪平台",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

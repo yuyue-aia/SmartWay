@@ -1,0 +1,18 @@
+[
+  {
+    "id": "chinese_recitation",
+    "name": "语文背诵",
+    "type": "recitation",
+    "description": "余跃的语文背诵任务",
+    "entry": "./chinese-recitation/index.html",
+    "enabled": true
+  },
+  {
+    "id": "base_conversion",
+    "name": "进制转换",
+    "type": "math",
+    "description": "10进制、5进制、16进制互相转换，12道题",
+    "entry": "./base-conversion/index.html",
+    "enabled": true
+  }
+]

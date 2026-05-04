@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>余晓进制转换</title>
+<link rel="stylesheet" href="/shared/base-conversion-task.css" />
+</head>
+<body>
+<div class="page">
+  <section class="hero">
+    <div>
+      <div class="eyebrow">数学专项 · 进制转换</div>
+      <h1 id="title">进制转换</h1>
+      <p class="subtitle" id="subtitle"></p>
+    </div>
+    <div class="score-card">
+      <div class="score-number" id="score">0/12</div>
+      <div class="score-label">当前得分</div>
+    </div>
+  </section>
+
+  <section class="toolbar">
+    <div class="tips">答案中十六进制可使用大写或小写，例如 <b>A8</b> / <b>a8</b> 都可以。填写内容会在当前浏览器会话中自动保留。</div>
+  </section>
+
+  <section class="question-grid" id="questionGrid"></section>
+
+  <section class="bottom-actions">
+    <div class="save-status" id="saveStatus"></div>
+    <div class="actions">
+      <button class="btn btn-primary" id="checkBtn">批改</button>
+      <button class="btn btn-secondary" id="resetBtn">重做</button>
+      <button class="btn btn-secondary" id="saveBtn" disabled>保存成绩</button>
+    </div>
+  </section>
+</div>
+
+<script>
+window.BASE_CONVERSION_TASK = {
+  childId: 'yuxiao',
+  childName: '余晓',
+  questions: [
+    { fromBase: 10, toBase: 5, value: '58', answer: '213' },
+    { fromBase: 10, toBase: 16, value: '91', answer: '5B' },
+    { fromBase: 5, toBase: 10, value: '241', answer: '71' },
+    { fromBase: 16, toBase: 10, value: '4D', answer: '77' },
+    { fromBase: 5, toBase: 16, value: '133', answer: '2B' },
+    { fromBase: 16, toBase: 5, value: '6E', answer: '420' },
+    { fromBase: 10, toBase: 5, value: '144', answer: '1034' },
+    { fromBase: 10, toBase: 16, value: '222', answer: 'DE' },
+    { fromBase: 5, toBase: 10, value: '1013', answer: '133' },
+    { fromBase: 16, toBase: 10, value: 'B4', answer: '180' },
+    { fromBase: 5, toBase: 16, value: '2222', answer: '138' },
+    { fromBase: 16, toBase: 5, value: 'D2', answer: '1320' }
+  ]
+};
+</script>
+<script src="/shared/base-conversion-task.js"></script>
+</body>
+</html>

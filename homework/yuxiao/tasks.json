@@ -1,0 +1,18 @@
+[
+  {
+    "id": "fraction_smart_calculation",
+    "name": "分数简便计算",
+    "type": "math",
+    "description": "精选20道有难度的分数简便计算题",
+    "entry": "./fraction-smart-calculation/index.html",
+    "enabled": true
+  },
+  {
+    "id": "base_conversion",
+    "name": "进制转换",
+    "type": "math",
+    "description": "10进制、5进制、16进制互相转换，12道题",
+    "entry": "./base-conversion/index.html",
+    "enabled": true
+  }
+]

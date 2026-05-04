@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>余晓分数简便计算</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100vh;
+    padding: 22px;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    color: #1f2937;
+    background:
+      radial-gradient(circle at top left, rgba(251, 146, 60, 0.2), transparent 34%),
+      linear-gradient(135deg, #fff7ed 0%, #fff 46%, #eff6ff 100%);
+  }
+  .container {
+    max-width: 1060px;
+    margin: 0 auto;
+    padding: 28px;
+    border: 1px solid rgba(251, 146, 60, 0.2);
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 18px 50px rgba(15, 23, 42, 0.1);
+  }
+  .hero {
+    display: grid;
+    gap: 14px;
+    margin-bottom: 22px;
+    padding: 22px;
+    border-radius: 22px;
+    color: #fff;
+    background: linear-gradient(135deg, #f97316, #ec4899);
+  }
+  h1 { font-size: 30px; line-height: 1.25; }
+  .hero p { color: rgba(255,255,255,0.92); line-height: 1.7; }
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
+  button {
+    border: 0;
+    border-radius: 999px;
+    padding: 11px 18px;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+  }
+  button:hover { transform: translateY(-1px); }
+  .primary { color: #fff; background: #2563eb; box-shadow: 0 10px 22px rgba(37, 99, 235, 0.24); }
+  .secondary { color: #9a3412; background: #ffedd5; }
+  .guide {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 22px;
+  }
+  .guide-card {
+    padding: 14px;
+    border: 1px solid #fed7aa;
+    border-radius: 18px;
+    background: #fff7ed;
+  }
+  .guide-card strong { display: block; color: #c2410c; margin-bottom: 6px; }
+  .guide-card span { color: #7c2d12; font-size: 13px; line-height: 1.55; }
+  .questions {
+    display: grid;
+    gap: 12px;
+    counter-reset: question;
+  }
+  .question {
+    display: grid;
+    gap: 8px;
+    padding: 16px 18px;
+    border: 1px solid #e5e7eb;
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.04);
+    counter-increment: question;
+  }
+  .question::before {
+    content: counter(question) ".";
+    width: 34px;
+    height: 34px;
+    display: inline-grid;
+    place-items: center;
+    border-radius: 12px;
+    color: #fff;
+    font-weight: 900;
+    background: linear-gradient(135deg, #f97316, #ec4899);
+  }
+  .formula { font-size: 21px; overflow-x: auto; padding-bottom: 4px; }
+  .tag {
+    width: fit-content;
+    padding: 5px 10px;
+    border-radius: 999px;
+    color: #1d4ed8;
+    background: #dbeafe;
+    font-size: 12px;
+    font-weight: 800;
+  }
+  .answer-panel {
+    margin-top: 24px;
+    padding: 20px;
+    border: 1px dashed #fb923c;
+    border-radius: 22px;
+    background: #fff7ed;
+  }
+  .answer-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .answer-header h2 { color: #9a3412; font-size: 22px; }
+  .answers {
+    display: none;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .answers.show { display: grid; }
+  .answer {
+    padding: 12px;
+    border-radius: 14px;
+    background: #fff;
+    border: 1px solid #fed7aa;
+    line-height: 1.7;
+  }
+  .answer b { color: #c2410c; }
+  .tip { color: #64748b; font-size: 13px; margin-top: 6px; }
+  @media (max-width: 820px) {
+    body { padding: 12px; }
+    .container { padding: 16px; }
+    .guide { grid-template-columns: 1fr 1fr; }
+    .answers { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 520px) {
+    .guide { grid-template-columns: 1fr; }
+    h1 { font-size: 24px; }
+    .formula { font-size: 18px; }
+  }
+</style>
+</head>
+<body>
+  <main class="container">
+    <section class="hero">
+      <h1>余晓：分数简便计算专项训练</h1>
+      <p>精选固定 20 道有难度的分数简便计算题，重点练习凑整、约分、拆分带分数、乘法分配律。先观察结构，再动笔计算，避免直接通分硬算。</p>
+      <div class="actions">
+        <button class="secondary" id="printBtn" type="button">打印练习</button>
+      </div>
+    </section>
+
+    <section class="guide" aria-label="训练目标">
+      <div class="guide-card"><strong>凑整</strong><span>先找分母相同、分子相加等于分母的分数。</span></div>
+      <div class="guide-card"><strong>约分</strong><span>看到分数乘整数，优先判断能不能直接约掉。</span></div>
+      <div class="guide-card"><strong>拆分带分数</strong><span>把带分数拆成整数部分 + 分数部分，再分别相乘。</span></div>
+      <div class="guide-card"><strong>乘法分配律</strong><span>相同分数反复出现时，先提取公因数。</span></div>
+    </section>
+
+    <section class="questions" id="questions"></section>
+
+    <section class="answer-panel">
+      <div class="answer-header">
+        <h2>答案区</h2>
+        <button class="primary" id="toggleAnswersBtn" type="button">查看答案</button>
+      </div>
+      <div class="answers" id="answers"></div>
+    </section>
+  </main>
+
+<script>
+const QUESTIONS = [
+  {
+    formula: String.raw`7\frac{5}{16} + 12\frac{7}{15} + 4\frac{11}{16} + 9\frac{8}{15}`,
+    answer: '34',
+    idea: String.raw`先凑整：\(\frac{5}{16}+\frac{11}{16}=1\)，\(\frac{7}{15}+\frac{8}{15}=1\)。`
+  },
+  {
+    formula: String.raw`\frac{12}{13} \times 7 + \frac{7}{13} \times 9 + 5 \times \frac{7}{13}`,
+    answer: '14',
+    idea: String.raw`把第一项看成 \(\frac{7}{13}\times12\)，再提取 \(\frac{7}{13}\)：\(\frac{7}{13}\times(12+9+5)=14\)。`
+  },
+  {
+    formula: String.raw`13\frac{7}{17} + 4\frac{11}{18} + 5\frac{10}{17} + 6\frac{7}{18}`,
+    answer: '30',
+    idea: String.raw`分别凑整：\(\frac{7}{17}+\frac{10}{17}=1\)，\(\frac{11}{18}+\frac{7}{18}=1\)。`
+  },
+  {
+    formula: String.raw`13\frac{1}{11} \times \frac{11}{12} + 14\frac{1}{12} \times \frac{12}{13}`,
+    answer: '25',
+    idea: String.raw`先把带分数看成假分数：\(13\frac{1}{11}=\frac{144}{11}\)，\(14\frac{1}{12}=\frac{169}{12}\)，交叉约分后是 \(12+13=25\)。`
+  },
+  {
+    formula: String.raw`3\frac{9}{23} \times 23 + \frac{2}{5} \times 5 + 5\frac{11}{27} \times 27`,
+    answer: '226',
+    idea: String.raw`分母和乘数相同，先拆带分数：\(3\times23+9+2+5\times27+11\)。`
+  },
+  {
+    formula: String.raw`\frac{4}{11} \times \frac{1}{13} + \frac{5}{13} \times \frac{1}{11} + \frac{17}{11} \times \frac{1}{13}`,
+    answer: String.raw`\frac{26}{143}`,
+    idea: String.raw`三项都化成分母 \(11\times13=143\)，分子合并：\(4+5+17=26\)。`
+  },
+  {
+    formula: String.raw`1\frac{4}{9} \times 27 + 2\frac{13}{29} \times 29 + 3\frac{14}{31} \times 31`,
+    answer: '217',
+    idea: String.raw`每项都拆成整数部分和分数部分：\(1\times27+12+2\times29+13+3\times31+14\)。`
+  },
+  {
+    formula: String.raw`1\frac{10}{19} \times 19 + 2\frac{11}{21} \times 21 + 2\frac{12}{23} \times 23`,
+    answer: '140',
+    idea: String.raw`分数部分与乘数直接约掉：\(19+10+42+11+46+12=140\)。`
+  },
+  {
+    formula: String.raw`8\frac{9}{20} + 6\frac{13}{17} + 11\frac{11}{20} + 5\frac{4}{17}`,
+    answer: '32',
+    idea: String.raw`先找同分母互补：\(\frac{9}{20}+\frac{11}{20}=1\)，\(\frac{13}{17}+\frac{4}{17}=1\)。`
+  },
+  {
+    formula: String.raw`\frac{9}{14} \times 8 + \frac{8}{14} \times 11 + 15 \times \frac{8}{14}`,
+    answer: '20',
+    idea: String.raw`第一项看成 \(\frac{8}{14}\times9\)，提取 \(\frac{8}{14}\)：\(\frac{8}{14}\times(9+11+15)=20\)。`
+  },
+  {
+    formula: String.raw`15\frac{1}{13} \times \frac{13}{14} + 16\frac{1}{14} \times \frac{14}{15} + 17\frac{1}{15} \times \frac{15}{16}`,
+    answer: '45',
+    idea: String.raw`利用结构：\((n+2)\frac{1}{n}\times\frac{n}{n+1}=n+1\)，三项分别得 \(14,15,16\)。`
+  },
+  {
+    formula: String.raw`\frac{7}{19} \times 11 + \frac{11}{19} \times 18 + 13 \times \frac{11}{19}`,
+    answer: '22',
+    idea: String.raw`把第一项看成 \(\frac{11}{19}\times7\)，提取 \(\frac{11}{19}\)：\(\frac{11}{19}\times(7+18+13)=22\)。`
+  },
+  {
+    formula: String.raw`\frac{8}{15} \times \frac{1}{17} + \frac{6}{17} \times \frac{1}{15} + \frac{16}{15} \times \frac{1}{17}`,
+    answer: String.raw`\frac{2}{17}`,
+    idea: String.raw`三项都化成分母 \(15\times17\)，分子合并：\(8+6+16=30\)，所以 \(\frac{30}{255}=\frac{2}{17}\)。`
+  },
+  {
+    formula: String.raw`4\frac{7}{18} \times 36 + 3\frac{5}{22} \times 44 + 6\frac{9}{25} \times 50`,
+    answer: '618',
+    idea: String.raw`乘数都是分母的倍数，拆带分数后直接算：\(4\times36+14+3\times44+10+6\times50+18\)。`
+  },
+  {
+    formula: String.raw`15\frac{8}{21} + 9\frac{14}{25} + 6\frac{13}{21} + 12\frac{11}{25}`,
+    answer: '44',
+    idea: String.raw`凑整：\(\frac{8}{21}+\frac{13}{21}=1\)，\(\frac{14}{25}+\frac{11}{25}=1\)。`
+  },
+  {
+    formula: String.raw`\frac{13}{23} \times 9 + \frac{9}{23} \times 17 + 16 \times \frac{9}{23}`,
+    answer: '18',
+    idea: String.raw`把第一项看成 \(\frac{9}{23}\times13\)，提取 \(\frac{9}{23}\)：\(\frac{9}{23}\times(13+17+16)=18\)。`
+  },
+  {
+    formula: String.raw`10\frac{1}{8} \times \frac{8}{9} + 11\frac{1}{9} \times \frac{9}{10} + 12\frac{1}{10} \times \frac{10}{11} + 13\frac{1}{11} \times \frac{11}{12}`,
+    answer: '42',
+    idea: String.raw`同一结构连续出现，四项分别约成 \(9,10,11,12\)，和为 \(42\)。`
+  },
+  {
+    formula: String.raw`\frac{7}{12} \times \frac{1}{19} + \frac{5}{19} \times \frac{1}{12} + \frac{24}{12} \times \frac{1}{19}`,
+    answer: String.raw`\frac{3}{19}`,
+    idea: String.raw`三项化成分母 \(12\times19\)，分子合并：\(7+5+24=36\)，所以 \(\frac{36}{228}=\frac{3}{19}\)。`
+  },
+  {
+    formula: String.raw`2\frac{15}{31} \times 31 + 5\frac{8}{27} \times 54 + 7\frac{11}{29} \times 58`,
+    answer: '791',
+    idea: String.raw`乘数是分母或分母的倍数：\(2\times31+15+5\times54+16+7\times58+22\)。`
+  },
+  {
+    formula: String.raw`10\frac{3}{14} + \frac{7}{18} \times 11 + 11 \times \frac{11}{18} + 8\frac{11}{14}`,
+    answer: '30',
+    idea: String.raw`前后两个带分数先凑成 \(19\)，中间两项提取 \(\frac{11}{18}\)：\(\frac{11}{18}\times(7+11)=11\)，总和 \(30\)。`
+  }
+];
+
+const questionsEl = document.getElementById('questions');
+const answersEl = document.getElementById('answers');
+const toggleAnswersBtn = document.getElementById('toggleAnswersBtn');
+const printBtn = document.getElementById('printBtn');
+let answersVisible = false;
+
+function renderMath() {
+  if (window.MathJax?.typesetPromise) {
+    window.MathJax.typesetPromise([questionsEl, answersEl]);
+  }
+}
+
+function render() {
+  questionsEl.innerHTML = '';
+  answersEl.innerHTML = '';
+
+  QUESTIONS.forEach((question, index) => {
+    const card = document.createElement('article');
+    card.className = 'question';
+
+    const formula = document.createElement('div');
+    formula.className = 'formula';
+    formula.textContent = `\\[${question.formula}=\\]`;
+
+    card.append(formula);
+    questionsEl.appendChild(card);
+
+    const answer = document.createElement('div');
+    answer.className = 'answer';
+    answer.innerHTML = `<b>${index + 1}.</b> \\(${question.answer}\\)<div class="tip">${question.idea}</div>`;
+    answersEl.appendChild(answer);
+  });
+
+  answersEl.classList.toggle('show', answersVisible);
+  toggleAnswersBtn.textContent = answersVisible ? '隐藏答案' : '查看答案';
+  renderMath();
+}
+
+toggleAnswersBtn.addEventListener('click', () => {
+  answersVisible = !answersVisible;
+  render();
+});
+
+printBtn.addEventListener('click', () => window.print());
+
+render();
+</script>
+</body>
+</html>
