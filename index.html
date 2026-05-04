@@ -303,11 +303,7 @@ function createTaskButton(child, task) {
   name.className = 'task-name';
   name.textContent = task.name;
 
-  const desc = document.createElement('div');
-  desc.className = 'task-desc';
-  desc.textContent = task.description || task.type || '';
-
-  button.append(name, desc);
+  button.append(name);
   button.addEventListener('click', () => openTask(child, task));
   return button;
 }
