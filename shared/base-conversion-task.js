@@ -19,7 +19,7 @@ const saveBtn = document.getElementById('saveBtn');
 const saveStatusEl = document.getElementById('saveStatus');
 
 titleEl.textContent = `${config.childName} · 进制转换`;
-subtitleEl.textContent = `共 ${questions.length} 道题：包含十进制转五进制/十六进制、反向转换，以及五进制和十六进制之间的转换。`;
+subtitleEl.textContent = config.description || `共 ${questions.length} 道题：包含十进制转五进制/十六进制、反向转换，以及五进制和十六进制之间的转换。`;
 
 function getBaseName(base) {
   return BASE_NAMES[base] || `${base}进制`;

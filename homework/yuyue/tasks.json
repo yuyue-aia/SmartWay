@@ -11,7 +11,7 @@
     "id": "base_conversion",
     "name": "进制转换",
     "type": "math",
-    "description": "10进制、5进制、16进制互相转换，12道题",
+    "description": "5进制和16进制相互转换，5道题",
     "entry": "./base-conversion/index.html",
     "enabled": true
   }
