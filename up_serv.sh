@@ -11,5 +11,8 @@ else
   echo "没有本地修改，跳过提交"
 fi
 
+echo "同步远端分支 origin/$branch"
+git pull --rebase origin "$branch"
+
 git push origin "$branch"
 node tools/update-github.js
