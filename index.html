@@ -211,7 +211,7 @@ async function init() {
       tasksByChild[child.id] = await apiGet(`/api/children/${encodeURIComponent(child.id)}/tasks`);
     }));
     renderTaskNav();
-    openFirstTask();
+    if (!openTaskFromUrl()) openFirstTask();
   } catch (error) {
     console.error(error);
     taskNavEl.innerHTML = '<div class="empty">任务加载失败</div>';
@@ -222,6 +222,36 @@ async function init() {
 function getOrderedChildren() {
   const byId = Object.fromEntries(children.map(child => [child.id, child]));
   return CHILD_ORDER.map(id => byId[id]).filter(Boolean);
+}
+
+function getTaskUrl(child, task) {
+  return `#/tasks/${encodeURIComponent(child.id)}/${encodeURIComponent(task.id)}`;
+}
+
+function safeDecode(value) {
+  try {
+    return decodeURIComponent(value || '');
+  } catch (error) {
+    return '';
+  }
+}
+
+function getTaskFromUrl() {
+  const parts = window.location.hash.replace(/^#\/?/, '').split('/');
+  if (parts.length !== 3 || parts[0] !== 'tasks') return null;
+
+  const childId = safeDecode(parts[1]);
+  const taskId = safeDecode(parts[2]);
+  const child = children.find(item => item.id === childId);
+  const task = (tasksByChild[childId] || []).find(item => item.id === taskId);
+  return child && task ? { child, task } : null;
+}
+
+function openTaskFromUrl() {
+  const target = getTaskFromUrl();
+  if (!target) return false;
+  openTask(target.child, target.task, { updateUrl: false });
+  return true;
 }
 
 function renderTaskNav() {
@@ -275,15 +305,19 @@ function openFirstTask() {
   for (const child of getOrderedChildren()) {
     const task = (tasksByChild[child.id] || [])[0];
     if (task) {
-      openTask(child, task);
+      openTask(child, task, { replaceUrl: true });
       return;
     }
   }
   renderPlaceholder('暂无任务');
 }
 
-function openTask(child, task) {
-  currentTaskKey = `${child.id}:${task.id}`;
+function openTask(child, task, options = {}) {
+  const nextTaskKey = `${child.id}:${task.id}`;
+  const existingFrame = workspaceEl.querySelector('iframe');
+  if (currentTaskKey === nextTaskKey && existingFrame) return;
+
+  currentTaskKey = nextTaskKey;
   taskNavEl.querySelectorAll('.task-btn').forEach(button => {
     button.classList.toggle('active', button.dataset.taskKey === currentTaskKey);
   });
@@ -292,6 +326,13 @@ function openTask(child, task) {
   iframe.src = task.entry;
   iframe.title = `${child.name} - ${task.name}`;
   workspaceEl.appendChild(iframe);
+
+  const updateUrl = options.updateUrl !== false;
+  const nextUrl = getTaskUrl(child, task);
+  if (updateUrl && window.location.hash !== nextUrl) {
+    const method = options.replaceUrl ? 'replaceState' : 'pushState';
+    window.history[method](null, '', nextUrl);
+  }
 }
 
 function renderPlaceholder(text) {
@@ -301,6 +342,9 @@ function renderPlaceholder(text) {
   placeholder.textContent = text;
   workspaceEl.appendChild(placeholder);
 }
+
+window.addEventListener('hashchange', openTaskFromUrl);
+window.addEventListener('popstate', openTaskFromUrl);
 
 init();
 </script>
