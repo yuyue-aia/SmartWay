@@ -14,5 +14,13 @@
     "description": "10进制、5进制、16进制互相转换，12道题",
     "entry": "./base-conversion/index.html",
     "enabled": true
+  },
+  {
+    "id": "track_meeting_variants",
+    "name": "相遇追及变式",
+    "type": "math",
+    "description": "相遇追及3类题型，每类2道",
+    "entry": "./track-meeting-variants/index.html",
+    "enabled": true
   }
 ]

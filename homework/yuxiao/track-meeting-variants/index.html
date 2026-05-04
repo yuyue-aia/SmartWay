@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>余晓相遇追及变式</title>
+<link rel="stylesheet" href="/shared/base-conversion-task.css" />
+<style>
+  .formula-card {
+    display: grid;
+    gap: 8px;
+    width: 100%;
+    padding: 16px;
+    border: 1px solid rgba(37, 99, 235, 0.18);
+    border-radius: 18px;
+    background: linear-gradient(135deg, #eff6ff, #f8fafc);
+    color: #334155;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+  .formula-title {
+    color: #1d4ed8;
+    font-weight: 900;
+  }
+  .question-card {
+    min-height: 280px;
+  }
+  .prompt {
+    min-height: 132px;
+    line-height: 1.8;
+  }
+  .prompt-line {
+    display: block;
+  }
+  .answer-input {
+    text-transform: none;
+  }
+  .unit {
+    display: inline-flex;
+    align-items: center;
+    padding: 0 14px;
+    border-radius: 14px;
+    background: #e0e7ff;
+    color: #3730a3;
+    font-weight: 900;
+  }
+  .solution {
+    margin-top: 8px;
+    color: #475569;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <section class="hero">
+    <div>
+      <div class="eyebrow">数学专项 · 相遇追及</div>
+      <h1 id="title">余晓 · 相遇追及三类题型</h1>
+      <p class="subtitle">覆盖不同时出发、距中点 x 米处相遇、多人相遇追及 3 类题型，每类 2 道。答案只填数字。</p>
+    </div>
+    <div class="score-card">
+      <div class="score-number" id="score">0/6</div>
+      <div class="score-label">当前得分</div>
+    </div>
+  </section>
+
+  <section class="toolbar">
+    <div class="formula-card">
+      <div class="formula-title">解题提醒</div>
+      <div>不同时出发：先把“先走的人独走的路程”算出来，再按追及问题处理。</div>
+      <div>距中点 x 米处相遇：两人路程差 = 2x，先求总相遇时间，再比较各自行程。</div>
+      <div>多人相遇追及：分别找清楚每一组对象对应的路程差、速度差或速度和。</div>
+    </div>
+  </section>
+
+  <section class="question-grid" id="questionGrid"></section>
+
+  <section class="bottom-actions">
+    <div class="save-status" id="saveStatus"></div>
+    <div class="actions">
+      <button class="btn btn-primary" id="checkBtn">批改</button>
+      <button class="btn btn-secondary" id="resetBtn">重做</button>
+      <button class="btn btn-secondary" id="saveBtn" disabled>保存成绩</button>
+    </div>
+  </section>
+</div>
+
+<script>
+const config = {
+  childId: 'yuxiao',
+  taskId: 'track_meeting_variants',
+  questions: [
+    {
+      tag: '不同时出发',
+      unit: '分钟',
+      prompt: '小明和小亮从校门口沿同一条路同向步行，小明每分钟走 72 米，先出发 4 分钟；小亮每分钟走 90 米，随后出发。小亮出发后经过多少分钟追上小明？',
+      answer: 16,
+      solution: '小明先走 72 × 4 = 288 米；小亮每分钟多走 90 - 72 = 18 米，所以 288 ÷ 18 = 16 分钟。'
+    },
+    {
+      tag: '不同时出发',
+      unit: '秒',
+      prompt: '500 米环形跑道上，甲每秒跑 6 米，从起点先跑 30 秒；乙每秒跑 8.5 米，随后从同一起点同向出发。乙出发后经过多少秒第一次追上甲？',
+      answer: 72,
+      solution: '甲先跑 6 × 30 = 180 米；乙每秒多跑 8.5 - 6 = 2.5 米，所以 180 ÷ 2.5 = 72 秒。'
+    },
+    {
+      tag: '距中点 x 米相遇',
+      unit: '米',
+      prompt: '甲、乙两地相距 840 米，小林每分钟走 75 米，小周每分钟走 65 米，两人同时从两地相向而行。相遇点距离两地中点多少米？',
+      answer: 30,
+      solution: '相遇时间 840 ÷ (75 + 65) = 6 分钟；小林走 75 × 6 = 450 米，中点在 420 米处，所以距离中点 450 - 420 = 30 米。'
+    },
+    {
+      tag: '距中点 x 米相遇',
+      unit: '米',
+      prompt: '东、西两村相距 1080 米，东东每分钟走 100 米，西西每分钟走 80 米，两人同时从两村相向出发。相遇点距离两村中点多少米？',
+      answer: 60,
+      solution: '相遇时间 1080 ÷ (100 + 80) = 6 分钟；两人路程差 (100 - 80) × 6 = 120 米，所以相遇点距中点 120 ÷ 2 = 60 米。'
+    },
+    {
+      tag: '多人相遇追及',
+      unit: '秒',
+      prompt: '360 米环形跑道上，甲、乙、丙从同一起点同时同向跑，速度分别是 9 米/秒、7 米/秒、6 米/秒。甲第一次同时追上乙和丙是在出发后多少秒？',
+      answer: 360,
+      solution: '甲追上乙需要多跑整圈：360 ÷ (9 - 7) = 180 秒一次；甲追上丙：360 ÷ (9 - 6) = 120 秒一次。180 和 120 的最小公倍数是 360，所以答案是 360 秒。'
+    },
+    {
+      tag: '多人相遇追及',
+      unit: '秒',
+      prompt: '甲、乙、丙在同一直线上同向跑，甲在最后，乙在甲前方 150 米，丙在乙前方 90 米。甲、乙、丙速度分别为 10 米/秒、8 米/秒、7 米/秒。甲最先追上其中一人要多少秒？',
+      answer: 75,
+      solution: '甲追乙：150 ÷ (10 - 8) = 75 秒；甲追丙：240 ÷ (10 - 7) = 80 秒，所以甲最先在 75 秒时追上乙。'
+    }
+  ]
+};
+
+const stateKey = `smartway.trackMeeting.${config.childId}.answers`;
+let lastResult = null;
+
+const questionGridEl = document.getElementById('questionGrid');
+const scoreEl = document.getElementById('score');
+const checkBtn = document.getElementById('checkBtn');
+const resetBtn = document.getElementById('resetBtn');
+const saveBtn = document.getElementById('saveBtn');
+const saveStatusEl = document.getElementById('saveStatus');
+
+function loadAnswers() {
+  try {
+    const answers = JSON.parse(sessionStorage.getItem(stateKey) || '[]');
+    return Array.isArray(answers) ? answers : [];
+  } catch (error) {
+    return [];
+  }
+}
+
+function saveAnswers() {
+  const answers = [...questionGridEl.querySelectorAll('.answer-input')].map(input => input.value);
+  sessionStorage.setItem(stateKey, JSON.stringify(answers));
+  saveStatusEl.textContent = '答案已自动保留';
+}
+
+function normalizeAnswer(value) {
+  return value.trim().replace(/[分钟秒米]/g, '').trim();
+}
+
+function isCorrectAnswer(inputValue, expected) {
+  const answer = Number(normalizeAnswer(inputValue));
+  return Number.isFinite(answer) && Math.abs(answer - expected) < 1e-8;
+}
+
+function renderQuestions() {
+  const savedAnswers = loadAnswers();
+  questionGridEl.innerHTML = '';
+
+  config.questions.forEach((question, index) => {
+    const card = document.createElement('article');
+    card.className = 'question-card';
+    card.dataset.index = index;
+
+    const head = document.createElement('div');
+    head.className = 'question-head';
+
+    const num = document.createElement('div');
+    num.className = 'question-index';
+    num.textContent = `第 ${index + 1} 题`;
+
+    const badge = document.createElement('div');
+    badge.className = 'badge';
+    badge.textContent = question.tag;
+
+    const prompt = document.createElement('div');
+    prompt.className = 'prompt';
+
+    const line = document.createElement('div');
+    line.className = 'prompt-line';
+    line.textContent = question.prompt;
+
+    const answerRow = document.createElement('div');
+    answerRow.className = 'answer-row';
+
+    const input = document.createElement('input');
+    input.className = 'answer-input';
+    input.type = 'text';
+    input.inputMode = 'decimal';
+    input.placeholder = `填写${question.unit}`;
+    input.autocomplete = 'off';
+    input.value = savedAnswers[index] || '';
+    input.addEventListener('input', saveAnswers);
+    input.addEventListener('keydown', event => {
+      if (event.key === 'Enter') checkAll();
+    });
+
+    const unit = document.createElement('span');
+    unit.className = 'unit';
+    unit.textContent = question.unit;
+
+    const feedback = document.createElement('div');
+    feedback.className = 'feedback';
+
+    const solution = document.createElement('div');
+    solution.className = 'solution';
+
+    head.append(num, badge);
+    prompt.append(line);
+    answerRow.append(input, unit);
+    card.append(head, prompt, answerRow, feedback, solution);
+    questionGridEl.appendChild(card);
+  });
+}
+
+function checkAll() {
+  saveAnswers();
+  let correct = 0;
+  let answered = 0;
+  const wrongItems = [];
+
+  questionGridEl.querySelectorAll('.question-card').forEach(card => {
+    const index = Number(card.dataset.index);
+    const question = config.questions[index];
+    const input = card.querySelector('.answer-input');
+    const feedback = card.querySelector('.feedback');
+    const solution = card.querySelector('.solution');
+    const value = normalizeAnswer(input.value);
+
+    if (!value) {
+      card.classList.remove('correct', 'wrong');
+      feedback.textContent = '';
+      solution.textContent = '';
+      return;
+    }
+
+    answered += 1;
+    const ok = isCorrectAnswer(value, question.answer);
+    card.classList.toggle('correct', ok);
+    card.classList.toggle('wrong', !ok);
+
+    if (ok) {
+      correct += 1;
+      feedback.textContent = '正确';
+      solution.textContent = '';
+    } else {
+      feedback.textContent = `错误，正确答案：${question.answer}${question.unit}`;
+      solution.textContent = question.solution;
+      wrongItems.push(`第 ${index + 1} 题：${question.prompt}`);
+    }
+  });
+
+  lastResult = { correct, total: answered, wrongItems };
+  scoreEl.textContent = `${correct}/${answered}`;
+  saveBtn.disabled = answered === 0;
+  saveStatusEl.textContent = answered === 0 ? '还没有填写答案' : `已批改 ${answered} 道题，可保存成绩`;
+}
+
+function resetAll() {
+  lastResult = null;
+  sessionStorage.removeItem(stateKey);
+  scoreEl.textContent = `0/${config.questions.length}`;
+  saveBtn.disabled = true;
+  saveStatusEl.textContent = '';
+  questionGridEl.querySelectorAll('.question-card').forEach(card => {
+    card.classList.remove('correct', 'wrong');
+    card.querySelector('.answer-input').value = '';
+    card.querySelector('.feedback').textContent = '';
+    card.querySelector('.solution').textContent = '';
+  });
+}
+
+async function saveResult() {
+  if (!lastResult) return;
+  saveBtn.disabled = true;
+  saveStatusEl.textContent = '正在保存...';
+
+  try {
+    const response = await fetch(`/api/children/${encodeURIComponent(config.childId)}/records`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        taskId: config.taskId,
+        total: lastResult.total,
+        correct: lastResult.correct,
+        wrongItems: lastResult.wrongItems
+      })
+    });
+
+    if (!response.ok) throw new Error(`保存失败：${response.status}`);
+    saveStatusEl.textContent = '成绩已保存';
+  } catch (error) {
+    console.error(error);
+    saveStatusEl.textContent = '保存失败，请确认后端服务正常';
+    saveBtn.disabled = false;
+  }
+}
+
+checkBtn.addEventListener('click', checkAll);
+resetBtn.addEventListener('click', resetAll);
+saveBtn.addEventListener('click', saveResult);
+
+renderQuestions();
+scoreEl.textContent = `0/${config.questions.length}`;
+if (loadAnswers().some(Boolean)) {
+  saveStatusEl.textContent = '已恢复上次填写的答案';
+}
+</script>
+</body>
+</html>
