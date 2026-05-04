@@ -1,10 +1,16 @@
 #!/usr/bin/env node
 
+require('dotenv').config({ quiet: true });
+
 const DEFAULT_TIMEOUT_MS = 60 * 1000;
 
 function printUsage() {
   console.log(`用法：
-  SMARTWAY_UPDATE_URL="https://你的域名/api/github/update" SMARTWAY_UPDATE_TOKEN="你的安全令牌" npm run update:github
+  在项目根目录 .env 中配置 SMARTWAY_UPDATE_URL 和 SMARTWAY_UPDATE_TOKEN 后执行：npm run update:github
+
+.env 示例：
+  SMARTWAY_UPDATE_URL="https://你的域名/api/github/update"
+  SMARTWAY_UPDATE_TOKEN="你的安全令牌"
 
 可选环境变量：
   SMARTWAY_UPDATE_TIMEOUT_MS=60000
@@ -78,6 +84,17 @@ async function updateGithub({ url, token, timeoutMs, restart }) {
     }
 
     return data;
+  } catch (error) {
+    if (error.statusCode) throw error;
+    if (error.name === 'AbortError') {
+      throw new Error(`请求远端更新接口超时：${timeoutMs}ms`);
+    }
+
+    const cause = error.cause?.message || error.cause?.code || '';
+    const message = cause
+      ? `请求远端更新接口失败：${error.message}（${cause}）`
+      : `请求远端更新接口失败：${error.message}`;
+    throw new Error(message);
   } finally {
     clearTimeout(timeout);
   }
