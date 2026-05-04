@@ -5,7 +5,8 @@
   "description": "SmartWay 家庭作业跟踪平台",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "update:github": "node tools/update-github.js"
   },
   "engines": {
     "node": ">=18"
