@@ -371,12 +371,11 @@ function checkAll() {
     if (ok) {
       correct += 1;
       feedback.textContent = '正确';
-      solution.textContent = '';
     } else {
-      feedback.textContent = `错误，正确答案：${question.answer}${question.unit}`;
-      solution.textContent = question.solution;
+      feedback.textContent = '错误';
       wrongItems.push(`第 ${index + 1} 题：${question.prompt}`);
     }
+    solution.textContent = '';
   });
 
   lastResult = { correct, total: answered, wrongItems };
