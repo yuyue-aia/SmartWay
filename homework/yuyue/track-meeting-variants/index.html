@@ -57,11 +57,11 @@
   <section class="hero">
     <div>
       <div class="eyebrow">数学专项 · 相遇追及</div>
-      <h1 id="title">余跃 · 相遇追及三类题型</h1>
-      <p class="subtitle">覆盖不同时出发、距中点 x 米处相遇、多人相遇追及 3 类题型，每类 2 道。答案只填数字。</p>
+      <h1 id="title">余跃 · 相遇追及变式训练</h1>
+      <p class="subtitle">覆盖不同时出发、环形追及、距中点 x 米处相遇、多人相遇追及等题型。答案只填数字。</p>
     </div>
     <div class="score-card">
-      <div class="score-number" id="score">0/6</div>
+      <div class="score-number" id="score">0/12</div>
       <div class="score-label">当前得分</div>
     </div>
   </section>
@@ -105,6 +105,48 @@ const config = {
       prompt: '400 米环形跑道上，甲每秒跑 7 米，从起点先跑 20 秒；乙每秒跑 9 米，随后从同一起点同向出发。乙出发后经过多少秒第一次追上甲？',
       answer: 70,
       solution: '甲先跑 7 × 20 = 140 米；乙每秒多跑 9 - 7 = 2 米，所以 140 ÷ 2 = 70 秒。'
+    },
+    {
+      tag: '直线追及·求速度',
+      unit: '米/分钟',
+      prompt: '甲、乙从同一地点沿同一方向走路，甲每分钟走 60 米，先出发 6 分钟；乙随后出发，12 分钟追上甲。乙每分钟走多少米？',
+      answer: 90,
+      solution: '甲先走 60 × 6 = 360 米；乙 12 分钟要多追 360 米，每分钟多走 360 ÷ 12 = 30 米，所以乙速 60 + 30 = 90 米/分钟。'
+    },
+    {
+      tag: '直线追及·求先走时间',
+      unit: '分钟',
+      prompt: '甲、乙从同一地点沿同一方向走路，甲每分钟走 55 米，先出发；乙每分钟走 75 米，乙出发后 11 分钟追上甲。甲先出发了多少分钟？',
+      answer: 4,
+      solution: '乙每分钟多走 75 - 55 = 20 米；11 分钟追上的领先路程是 20 × 11 = 220 米；甲先走时间 220 ÷ 55 = 4 分钟。'
+    },
+    {
+      tag: '直线追及·继续领先',
+      unit: '米',
+      prompt: '甲、乙从同一地点沿同一方向走路，甲每分钟走 60 米，甲先出发 5 分钟；乙每分钟走 80 米，追上甲后又继续走 8 分钟。此时乙领先甲多少米？',
+      answer: 160,
+      solution: '追上后两人从同一点继续走，乙每分钟多走 80 - 60 = 20 米；8 分钟领先 20 × 8 = 160 米。'
+    },
+    {
+      tag: '环形追及·第 n 次追上',
+      unit: '秒',
+      prompt: '400 米环形跑道上，甲每秒跑 7 米，从起点先跑 20 秒；乙每秒跑 9 米，随后从同一起点同向出发。乙出发后经过多少秒第 3 次追上甲？',
+      answer: 470,
+      solution: '第一次追上需要 70 秒；之后每多追上一圈用 400 ÷ (9 - 7) = 200 秒。第 3 次追上：70 + 2 × 200 = 470 秒。'
+    },
+    {
+      tag: '环形相遇·反向',
+      unit: '秒',
+      prompt: '400 米环形跑道上，甲每秒跑 7 米，乙每秒跑 9 米，两人从同一起点同时反向跑。出发后多少秒再次相遇？',
+      answer: 25,
+      solution: '反向跑用速度和，400 ÷ (7 + 9) = 25 秒。'
+    },
+    {
+      tag: '环形追及·半圈差',
+      unit: '秒',
+      prompt: '400 米环形跑道上，甲在乙后方 200 米处同向跑，甲每秒跑 9 米，乙每秒跑 5 米。甲经过多少秒追上乙？',
+      answer: 50,
+      solution: '甲需要追上 200 米，速度差是 9 - 5 = 4 米/秒，所以 200 ÷ 4 = 50 秒。'
     },
     {
       tag: '距中点 x 米相遇',
@@ -215,7 +257,7 @@ function renderQuestions() {
 
     const unit = document.createElement('span');
     unit.className = 'unit';
-    unit.textContent = '秒';
+    unit.textContent = question.unit;
 
     const feedback = document.createElement('div');
     feedback.className = 'feedback';
