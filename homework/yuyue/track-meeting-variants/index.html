@@ -166,6 +166,12 @@ const config = {
 };
 
 const stateKey = `smartway.trackMeeting.${config.childId}.answers`;
+const questionSignature = JSON.stringify(config.questions.map(question => ({
+  tag: question.tag,
+  unit: question.unit,
+  prompt: question.prompt,
+  answer: question.answer
+})));
 let lastResult = null;
 
 const questionGridEl = document.getElementById('questionGrid');
@@ -177,16 +183,22 @@ const saveStatusEl = document.getElementById('saveStatus');
 
 function loadAnswers() {
   try {
-    const answers = JSON.parse(sessionStorage.getItem(stateKey) || '[]');
-    return Array.isArray(answers) ? answers : [];
+    const saved = JSON.parse(sessionStorage.getItem(stateKey) || 'null');
+    if (!saved) return [];
+    if (Array.isArray(saved) || saved.signature !== questionSignature || !Array.isArray(saved.answers)) {
+      sessionStorage.removeItem(stateKey);
+      return [];
+    }
+    return saved.answers;
   } catch (error) {
+    sessionStorage.removeItem(stateKey);
     return [];
   }
 }
 
 function saveAnswers() {
   const answers = [...questionGridEl.querySelectorAll('.answer-input')].map(input => input.value);
-  sessionStorage.setItem(stateKey, JSON.stringify(answers));
+  sessionStorage.setItem(stateKey, JSON.stringify({ signature: questionSignature, answers }));
   saveStatusEl.textContent = '答案已自动保留';
 }
 
