@@ -22,5 +22,13 @@
     "description": "相遇追及3类题型，每类2道",
     "entry": "./track-meeting-variants/index.html",
     "enabled": true
+  },
+  {
+    "id": "mixed_practice",
+    "name": "综合练习",
+    "type": "math",
+    "description": "5 道进制转换 + 5 道相遇追及",
+    "entry": "./mixed-practice/index.html",
+    "enabled": true
   }
 ]
