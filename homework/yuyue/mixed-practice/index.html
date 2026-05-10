@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>余跃综合练习</title>
+<link rel="stylesheet" href="/shared/base-conversion-task.css" />
+<style>
+  .formula-card {
+    display: grid;
+    gap: 8px;
+    width: 100%;
+    padding: 16px;
+    border: 1px solid rgba(37, 99, 235, 0.18);
+    border-radius: 18px;
+    background: linear-gradient(135deg, #eff6ff, #f8fafc);
+    color: #334155;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+  .formula-title {
+    color: #1d4ed8;
+    font-weight: 900;
+  }
+  .section-title {
+    margin: 18px 0 10px;
+    font-size: 18px;
+    font-weight: 800;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-title::before {
+    content: "";
+    width: 4px;
+    height: 18px;
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    border-radius: 999px;
+  }
+  .question-card {
+    min-height: 220px;
+  }
+  .prompt {
+    min-height: 100px;
+    line-height: 1.8;
+  }
+  .prompt-line {
+    display: block;
+  }
+  .answer-input {
+    text-transform: none;
+  }
+  .unit {
+    display: inline-flex;
+    align-items: center;
+    padding: 0 14px;
+    border-radius: 14px;
+    background: #e0e7ff;
+    color: #3730a3;
+    font-weight: 900;
+  }
+  .radix-expression {
+    display: inline-flex;
+    align-items: baseline;
+    font-weight: 700;
+  }
+  .radix-expression sub {
+    margin-left: 2px;
+    font-size: 0.7em;
+    color: #2563eb;
+  }
+  .convert-arrow {
+    margin: 0 8px;
+    color: #2563eb;
+    font-weight: 800;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <section class="hero">
+    <div>
+      <div class="eyebrow">综合练习 · 进制转换 + 相遇追及</div>
+      <h1 id="title">余跃 · 综合练习</h1>
+      <p class="subtitle">5 道进制转换 + 5 道相遇追及，全部可整除可口算。答案只填数字。</p>
+    </div>
+    <div class="score-card">
+      <div class="score-number" id="score">0/10</div>
+      <div class="score-label">当前得分</div>
+    </div>
+  </section>
+
+  <section class="toolbar">
+    <div class="formula-card">
+      <div class="formula-title">解题提醒</div>
+      <div>进制转换：十进制 → 其他进制用「除基取余」；其他进制 → 十进制用「位权展开」。</div>
+      <div>追及问题：路程差 ÷ 速度差 = 追及时间。相向相遇：路程和 ÷ 速度和 = 相遇时间。</div>
+    </div>
+  </section>
+
+  <div class="section-title" id="sectionBaseTitle">一、进制转换（5 题）</div>
+  <section class="question-grid" id="baseGrid"></section>
+
+  <div class="section-title" id="sectionMeetTitle">二、相遇追及（5 题）</div>
+  <section class="question-grid" id="meetGrid"></section>
+
+  <section class="bottom-actions">
+    <div class="save-status" id="saveStatus"></div>
+    <div class="actions">
+      <button class="btn btn-primary" id="checkBtn">批改</button>
+      <button class="btn btn-secondary" id="resetBtn">重做</button>
+      <button class="btn btn-secondary" id="saveBtn" disabled>保存成绩</button>
+    </div>
+  </section>
+</div>
+
+<script>
+const BASE_NAMES = { 2: '二进制', 5: '五进制', 8: '八进制', 10: '十进制', 16: '十六进制' };
+
+const config = {
+  childId: 'yuyue',
+  taskId: 'mixed_practice',
+  baseQuestions: [
+    { id: 'b1', tag: '十进制 → 五进制', value: '47', fromBase: 10, toBase: 5, answer: '142' },
+    { id: 'b2', tag: '十进制 → 十六进制', value: '60', fromBase: 10, toBase: 16, answer: '3C' },
+    { id: 'b3', tag: '五进制 → 十进制', value: '203', fromBase: 5, toBase: 10, answer: '53' },
+    { id: 'b4', tag: '十六进制 → 十进制', value: '2A', fromBase: 16, toBase: 10, answer: '42' },
+    { id: 'b5', tag: '五进制 → 十六进制', value: '124', fromBase: 5, toBase: 16, answer: '27' }
+  ],
+  meetQuestions: [
+    {
+      id: 'm1',
+      tag: '直线追及·求时间',
+      unit: '分钟',
+      prompt: '甲在乙后方 120 米处，两人同时同向走路。甲每分钟走 60 米，乙每分钟走 40 米。甲经过多少分钟追上乙？',
+      answer: 6
+    },
+    {
+      id: 'm2',
+      tag: '不同时出发·求追上时间',
+      unit: '分钟',
+      prompt: '甲、乙从同一地点同向走路，甲每分钟走 50 米，先出发 4 分钟；乙每分钟走 70 米，随后出发。乙出发后多少分钟追上甲？',
+      answer: 10
+    },
+    {
+      id: 'm3',
+      tag: '相向相遇·求时间',
+      unit: '分钟',
+      prompt: '甲、乙两地相距 480 米，小东每分钟走 50 米，小西每分钟走 30 米，两人同时相向而行。多少分钟后相遇？',
+      answer: 6
+    },
+    {
+      id: 'm4',
+      tag: '环形同向·套圈',
+      unit: '秒',
+      prompt: '300 米环形跑道上，甲、乙从同一起点同时同向跑，甲每秒跑 8 米，乙每秒跑 5 米。甲经过多少秒第一次套乙一圈？',
+      answer: 100
+    },
+    {
+      id: 'm5',
+      tag: '环形反向·相遇',
+      unit: '秒',
+      prompt: '240 米环形跑道上，甲、乙从同一起点同时反向跑，甲每秒跑 7 米，乙每秒跑 5 米。多少秒后两人再次相遇？',
+      answer: 20
+    }
+  ]
+};
+
+const stateKey = `smartway.mixedPractice.${config.childId}.answers`;
+const allQuestions = [
+  ...config.baseQuestions.map(q => ({ ...q, kind: 'base' })),
+  ...config.meetQuestions.map(q => ({ ...q, kind: 'meet' }))
+];
+const questionSignature = JSON.stringify(allQuestions.map(q => ({
+  id: q.id,
+  kind: q.kind,
+  tag: q.tag,
+  prompt: q.prompt || `${q.value}_${q.fromBase} → ${q.toBase}`,
+  answer: q.answer
+})));
+
+let lastResult = null;
+
+const baseGridEl = document.getElementById('baseGrid');
+const meetGridEl = document.getElementById('meetGrid');
+const scoreEl = document.getElementById('score');
+const checkBtn = document.getElementById('checkBtn');
+const resetBtn = document.getElementById('resetBtn');
+const saveBtn = document.getElementById('saveBtn');
+const saveStatusEl = document.getElementById('saveStatus');
+
+function loadAnswers() {
+  try {
+    const saved = JSON.parse(sessionStorage.getItem(stateKey) || 'null');
+    if (!saved || saved.signature !== questionSignature || typeof saved.answers !== 'object') {
+      sessionStorage.removeItem(stateKey);
+      return {};
+    }
+    return saved.answers;
+  } catch (error) {
+    sessionStorage.removeItem(stateKey);
+    return {};
+  }
+}
+
+function saveAnswers() {
+  const answers = {};
+  document.querySelectorAll('.answer-input').forEach(input => {
+    answers[input.dataset.qid] = input.value;
+  });
+  sessionStorage.setItem(stateKey, JSON.stringify({ signature: questionSignature, answers }));
+  saveStatusEl.textContent = '答案已自动保留';
+}
+
+function getBaseName(base) {
+  return BASE_NAMES[base] || `${base}进制`;
+}
+
+function appendRadixExpression(parent, value, base) {
+  const expression = document.createElement('span');
+  expression.className = 'radix-expression';
+  const body = document.createElement('span');
+  body.textContent = `(${value})`;
+  const sub = document.createElement('sub');
+  sub.textContent = base;
+  expression.append(body, sub);
+  parent.appendChild(expression);
+}
+
+function normalizeBaseAnswer(value) {
+  return value.trim().replace(/^0x/i, '').toUpperCase();
+}
+
+function isBaseCorrect(input, expected) {
+  return normalizeBaseAnswer(input) === normalizeBaseAnswer(expected);
+}
+
+function normalizeMeetAnswer(value) {
+  return value.trim().replace(/米\/分钟|分钟|秒|米/g, '').trim();
+}
+
+function isMeetCorrect(input, expected) {
+  const num = Number(normalizeMeetAnswer(input));
+  return Number.isFinite(num) && Math.abs(num - expected) < 1e-8;
+}
+
+function createCard(question, index, savedValue) {
+  const card = document.createElement('article');
+  card.className = 'question-card';
+  card.dataset.qid = question.id;
+  card.dataset.kind = question.kind;
+
+  const head = document.createElement('div');
+  head.className = 'question-head';
+
+  const num = document.createElement('div');
+  num.className = 'question-index';
+  num.textContent = `第 ${index} 题`;
+
+  const badge = document.createElement('div');
+  badge.className = 'badge';
+  badge.textContent = question.tag;
+
+  const prompt = document.createElement('div');
+  prompt.className = 'prompt';
+
+  if (question.kind === 'base') {
+    const promptLabel = document.createElement('div');
+    promptLabel.className = 'prompt-label';
+    promptLabel.textContent = '请完成下面的进制转换';
+
+    const promptLine = document.createElement('div');
+    promptLine.className = 'prompt-line';
+    appendRadixExpression(promptLine, question.value, question.fromBase);
+    const arrow = document.createElement('span');
+    arrow.className = 'convert-arrow';
+    arrow.textContent = '→';
+    promptLine.appendChild(arrow);
+    appendRadixExpression(promptLine, '?', question.toBase);
+
+    prompt.append(promptLabel, promptLine);
+  } else {
+    const line = document.createElement('div');
+    line.className = 'prompt-line';
+    line.textContent = question.prompt;
+    prompt.append(line);
+  }
+
+  const answerRow = document.createElement('div');
+  answerRow.className = 'answer-row';
+
+  const input = document.createElement('input');
+  input.className = 'answer-input';
+  input.type = 'text';
+  input.dataset.qid = question.id;
+  input.autocomplete = 'off';
+  input.value = savedValue || '';
+  if (question.kind === 'base') {
+    input.placeholder = `填写${getBaseName(question.toBase)}`;
+  } else {
+    input.inputMode = 'decimal';
+    input.placeholder = `填写${question.unit}`;
+  }
+  input.addEventListener('input', saveAnswers);
+  input.addEventListener('keydown', event => {
+    if (event.key === 'Enter') checkAll();
+  });
+
+  const unit = document.createElement('span');
+  unit.className = 'unit';
+  unit.textContent = question.kind === 'base' ? getBaseName(question.toBase) : question.unit;
+
+  const feedback = document.createElement('div');
+  feedback.className = 'feedback';
+
+  head.append(num, badge);
+  answerRow.append(input, unit);
+  card.append(head, prompt, answerRow, feedback);
+  return card;
+}
+
+function renderQuestions() {
+  const saved = loadAnswers();
+  baseGridEl.innerHTML = '';
+  meetGridEl.innerHTML = '';
+
+  config.baseQuestions.forEach((question, idx) => {
+    baseGridEl.appendChild(createCard({ ...question, kind: 'base' }, idx + 1, saved[question.id]));
+  });
+  config.meetQuestions.forEach((question, idx) => {
+    meetGridEl.appendChild(createCard({ ...question, kind: 'meet' }, idx + 1, saved[question.id]));
+  });
+}
+
+function checkAll() {
+  saveAnswers();
+  let correct = 0;
+  let answered = 0;
+  const wrongItems = [];
+
+  document.querySelectorAll('.question-card').forEach(card => {
+    const input = card.querySelector('.answer-input');
+    const feedback = card.querySelector('.feedback');
+    const value = input.value.trim();
+    const qid = card.dataset.qid;
+    const kind = card.dataset.kind;
+    const question = (kind === 'base'
+      ? config.baseQuestions
+      : config.meetQuestions).find(q => q.id === qid);
+
+    if (!value) {
+      card.classList.remove('correct', 'wrong');
+      feedback.textContent = '';
+      return;
+    }
+
+    answered += 1;
+    const ok = kind === 'base'
+      ? isBaseCorrect(value, question.answer)
+      : isMeetCorrect(value, question.answer);
+    card.classList.toggle('correct', ok);
+    card.classList.toggle('wrong', !ok);
+    feedback.textContent = ok ? '正确' : '错误';
+
+    if (ok) {
+      correct += 1;
+    } else {
+      const desc = kind === 'base'
+        ? `(${question.value})_${question.fromBase} → ${getBaseName(question.toBase)}`
+        : question.prompt;
+      wrongItems.push(`${kind === 'base' ? '进制' : '相遇追及'} · ${desc}`);
+    }
+  });
+
+  lastResult = { correct, total: answered, wrongItems };
+  scoreEl.textContent = `${correct}/${answered}`;
+  saveBtn.disabled = answered === 0;
+  saveStatusEl.textContent = answered === 0
+    ? '还没有填写答案'
+    : `已批改 ${answered} 道题，可保存成绩`;
+}
+
+function resetAll() {
+  lastResult = null;
+  sessionStorage.removeItem(stateKey);
+  scoreEl.textContent = `0/${allQuestions.length}`;
+  saveBtn.disabled = true;
+  saveStatusEl.textContent = '';
+  document.querySelectorAll('.question-card').forEach(card => {
+    card.classList.remove('correct', 'wrong');
+    card.querySelector('.answer-input').value = '';
+    card.querySelector('.feedback').textContent = '';
+  });
+}
+
+async function saveResult() {
+  if (!lastResult) return;
+  saveBtn.disabled = true;
+  saveStatusEl.textContent = '正在保存...';
+
+  try {
+    const response = await fetch(`/api/children/${encodeURIComponent(config.childId)}/records`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        taskId: config.taskId,
+        total: lastResult.total,
+        correct: lastResult.correct,
+        wrongItems: lastResult.wrongItems
+      })
+    });
+    if (!response.ok) throw new Error(`保存失败：${response.status}`);
+    saveStatusEl.textContent = '成绩已保存';
+  } catch (error) {
+    console.error(error);
+    saveStatusEl.textContent = '保存失败，请确认后端服务正常';
+    saveBtn.disabled = false;
+  }
+}
+
+checkBtn.addEventListener('click', checkAll);
+resetBtn.addEventListener('click', resetAll);
+saveBtn.addEventListener('click', saveResult);
+
+renderQuestions();
+scoreEl.textContent = `0/${allQuestions.length}`;
+if (Object.values(loadAnswers()).some(Boolean)) {
+  saveStatusEl.textContent = '已恢复上次填写的答案';
+}
+</script>
+</body>
+</html>
