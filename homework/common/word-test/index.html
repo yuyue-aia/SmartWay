@@ -212,6 +212,35 @@
     margin-top: 18px;
     flex-wrap: wrap;
   }
+  .size-picker {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #fff;
+    padding: 4px;
+    border-radius: 12px;
+    box-shadow: inset 0 0 0 1px #c7d2fe;
+  }
+  .size-picker span {
+    font-size: 13px;
+    color: #475569;
+    padding: 0 8px;
+  }
+  .size-picker label {
+    cursor: pointer;
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #2563eb;
+    user-select: none;
+  }
+  .size-picker label input { display: none; }
+  .size-picker label.selected {
+    background: linear-gradient(135deg, #2563eb, #4f46e5);
+    color: #fff;
+    box-shadow: 0 6px 14px rgba(37, 99, 235, 0.22);
+  }
 </style>
 </head>
 <body>
@@ -219,12 +248,21 @@
   <header class="title-card">
     <div>
       <h1>英语单词测试</h1>
-      <div class="meta" id="meta">基于小学考纲词库 706 词，随机抽取 50 题</div>
+      <div class="meta" id="meta">基于小学考纲词库 706 词，随机抽取题目进行选择题测试</div>
     </div>
     <div class="progress" id="progress">未开始</div>
   </header>
 
   <div class="actions">
+    <div class="size-picker" id="sizePicker">
+      <span>题数</span>
+      <label data-size="50" class="selected">
+        <input type="radio" name="size" value="50" checked /> 50 题
+      </label>
+      <label data-size="100">
+        <input type="radio" name="size" value="100" /> 100 题
+      </label>
+    </div>
     <button id="startBtn">创建测试</button>
     <button id="submitBtn" class="secondary" disabled>提交</button>
     <button id="resetBtn" class="danger" disabled>重新开始</button>
@@ -232,14 +270,14 @@
 
   <div id="content">
     <div class="empty">
-      点击「创建测试」随机生成 <strong>50</strong> 道题。<br />
-      每题给出一个英文单词，4 个中文选项中选出正确含义。
+      选择题数后点击「创建测试」，每题给出一个英文单词，4 个中文选项中选出正确含义。
     </div>
   </div>
 </div>
 
 <script>
-const TEST_SIZE = 50;
+const SUPPORTED_SIZES = [50, 100];
+const DEFAULT_SIZE = 50;
 const OPTION_COUNT = 4;
 const VOCAB_URL = './vocab.json';
 
@@ -249,17 +287,34 @@ const resetBtn = document.getElementById('resetBtn');
 const contentEl = document.getElementById('content');
 const progressEl = document.getElementById('progress');
 const metaEl = document.getElementById('meta');
+const sizePickerEl = document.getElementById('sizePicker');
 
 let vocab = [];
 let questions = [];
 let answers = [];
+let currentSize = DEFAULT_SIZE;
+
+function getSelectedSize() {
+  const input = sizePickerEl.querySelector('input[name="size"]:checked');
+  const value = Number(input && input.value);
+  return SUPPORTED_SIZES.includes(value) ? value : DEFAULT_SIZE;
+}
+
+function refreshSizePicker() {
+  sizePickerEl.querySelectorAll('label').forEach(label => {
+    const input = label.querySelector('input');
+    label.classList.toggle('selected', !!input && input.checked);
+  });
+}
+
+sizePickerEl.addEventListener('change', refreshSizePicker);
 
 async function loadVocab() {
   if (vocab.length) return;
   const res = await fetch(VOCAB_URL);
   if (!res.ok) throw new Error('词库加载失败');
   vocab = await res.json();
-  metaEl.textContent = `基于小学考纲词库 ${vocab.length} 词，随机抽取 ${TEST_SIZE} 题`;
+  metaEl.textContent = `基于小学考纲词库 ${vocab.length} 词，可选 50 / 100 题`;
 }
 
 function shuffle(arr) {
@@ -272,21 +327,21 @@ function shuffle(arr) {
 }
 
 function pickDistractors(correct, count) {
-  const pool = vocab.filter(item => item.meaning !== correct.meaning);
   const used = new Set([correct.meaning]);
+  const pool = shuffle(vocab);
   const picks = [];
-  const shuffled = shuffle(pool);
-  for (const item of shuffled) {
+  for (const item of pool) {
     if (picks.length >= count) break;
-    if (used.has(item.meaning)) continue;
+    if (!item.meaning || used.has(item.meaning)) continue;
     used.add(item.meaning);
     picks.push(item.meaning);
   }
   return picks;
 }
 
-function buildQuestions() {
-  const sampled = shuffle(vocab).slice(0, TEST_SIZE);
+function buildQuestions(size) {
+  const usable = vocab.filter(item => item.word && item.meaning);
+  const sampled = shuffle(usable).slice(0, size);
   return sampled.map((entry, index) => {
     const distractors = pickDistractors(entry, OPTION_COUNT - 1);
     const options = shuffle([entry.meaning, ...distractors]);
@@ -297,6 +352,12 @@ function buildQuestions() {
       options
     };
   });
+}
+
+function setSizePickerDisabled(disabled) {
+  sizePickerEl.querySelectorAll('input').forEach(input => { input.disabled = disabled; });
+  sizePickerEl.style.opacity = disabled ? '0.5' : '1';
+  sizePickerEl.style.pointerEvents = disabled ? 'none' : 'auto';
 }
 
 function renderQuiz() {
@@ -368,13 +429,15 @@ function updateProgress() {
 }
 
 function startQuiz() {
-  questions = buildQuestions();
+  currentSize = getSelectedSize();
+  questions = buildQuestions(currentSize);
   answers = new Array(questions.length).fill(null);
   renderQuiz();
   updateProgress();
   startBtn.disabled = true;
   resetBtn.disabled = false;
   submitBtn.disabled = true;
+  setSizePickerDisabled(true);
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -383,13 +446,13 @@ function resetQuiz() {
   answers = [];
   contentEl.innerHTML = `
     <div class="empty">
-      点击「创建测试」随机生成 <strong>${TEST_SIZE}</strong> 道题。<br />
-      每题给出一个英文单词，4 个中文选项中选出正确含义。
+      选择题数后点击「创建测试」，每题给出一个英文单词，4 个中文选项中选出正确含义。
     </div>`;
   startBtn.disabled = false;
   submitBtn.disabled = true;
   resetBtn.disabled = true;
   progressEl.textContent = '未开始';
+  setSizePickerDisabled(false);
 }
 
 function submitQuiz() {
@@ -460,6 +523,7 @@ function submitQuiz() {
   submitBtn.disabled = true;
   startBtn.disabled = false;
   resetBtn.disabled = false;
+  setSizePickerDisabled(false);
   progressEl.textContent = `已完成 ${correct}/${total}`;
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -486,6 +550,7 @@ submitBtn.addEventListener('click', () => {
 });
 
 resetBtn.addEventListener('click', resetQuiz);
+refreshSizePicker();
 </script>
 </body>
 </html>
