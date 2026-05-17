@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>英语单词测试</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #f4f7fb;
+    color: #1f2937;
+    min-height: 100vh;
+  }
+  .page {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 20px 18px 60px;
+  }
+  header.title-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    background: linear-gradient(135deg, #4f46e5, #2563eb);
+    color: #fff;
+    padding: 18px 22px;
+    border-radius: 18px;
+    box-shadow: 0 14px 30px rgba(37, 99, 235, 0.22);
+  }
+  .title-card h1 {
+    font-size: 20px;
+    letter-spacing: 0.02em;
+  }
+  .title-card .meta {
+    font-size: 13px;
+    opacity: 0.9;
+    margin-top: 4px;
+  }
+  .progress {
+    background: rgba(255, 255, 255, 0.18);
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-weight: 800;
+    font-size: 14px;
+  }
+  .actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 16px 0;
+  }
+  button {
+    cursor: pointer;
+    border: 0;
+    border-radius: 12px;
+    padding: 10px 18px;
+    font-weight: 700;
+    font-size: 14px;
+    color: #fff;
+    background: #2563eb;
+    box-shadow: 0 8px 18px rgba(37, 99, 235, 0.22);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  }
+  button:hover { transform: translateY(-1px); }
+  button:disabled {
+    background: #cbd5e1;
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+  button.secondary {
+    background: #fff;
+    color: #2563eb;
+    box-shadow: inset 0 0 0 1px #c7d2fe, 0 6px 14px rgba(37, 99, 235, 0.08);
+  }
+  button.danger {
+    background: #ef4444;
+    box-shadow: 0 8px 18px rgba(239, 68, 68, 0.22);
+  }
+  .empty {
+    background: #fff;
+    border: 1px dashed #cbd5e1;
+    border-radius: 16px;
+    padding: 40px 20px;
+    text-align: center;
+    color: #64748b;
+    font-size: 15px;
+    line-height: 1.8;
+  }
+  .quiz {
+    display: grid;
+    gap: 14px;
+  }
+  .question-card {
+    background: #fff;
+    border-radius: 18px;
+    padding: 18px 20px;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+    border: 1px solid rgba(148, 163, 184, 0.18);
+  }
+  .question-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .question-index {
+    font-size: 12px;
+    font-weight: 800;
+    color: #6366f1;
+    background: #eef2ff;
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+  .question-word {
+    font-size: 22px;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: 0.01em;
+  }
+  .options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  @media (max-width: 560px) {
+    .options { grid-template-columns: 1fr; }
+    .title-card { flex-direction: column; align-items: flex-start; }
+  }
+  .option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 14px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    cursor: pointer;
+    font-size: 15px;
+    color: #1f2937;
+    transition: all 0.15s ease;
+    user-select: none;
+  }
+  .option:hover { border-color: #93c5fd; background: #eff6ff; }
+  .option input { display: none; }
+  .option .marker {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid #cbd5e1;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    font-size: 12px;
+    font-weight: 700;
+    color: #64748b;
+    background: #fff;
+  }
+  .option.selected {
+    border-color: #2563eb;
+    background: linear-gradient(135deg, #eff6ff, #eef2ff);
+    box-shadow: 0 8px 18px rgba(37, 99, 235, 0.12);
+  }
+  .option.selected .marker {
+    border-color: #2563eb;
+    background: #2563eb;
+    color: #fff;
+  }
+  .summary {
+    background: #fff;
+    border-radius: 18px;
+    padding: 24px;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+    border: 1px solid rgba(148, 163, 184, 0.18);
+  }
+  .summary .score {
+    font-size: 38px;
+    font-weight: 900;
+    color: #2563eb;
+    margin: 6px 0 4px;
+  }
+  .summary .desc {
+    color: #64748b;
+    font-size: 14px;
+    margin-bottom: 14px;
+  }
+  .review-list {
+    display: grid;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .review-item {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    font-size: 14px;
+  }
+  .review-item.wrong { background: #fef2f2; border-color: #fecaca; }
+  .review-item .word { font-weight: 800; color: #0f172a; }
+  .review-item .line { color: #475569; font-size: 13px; }
+  .review-item .line .ok { color: #16a34a; font-weight: 700; }
+  .review-item .line .bad { color: #dc2626; font-weight: 700; }
+  .footer-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 18px;
+    flex-wrap: wrap;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="title-card">
+    <div>
+      <h1>英语单词测试</h1>
+      <div class="meta" id="meta">基于小学考纲词库 706 词，随机抽取 50 题</div>
+    </div>
+    <div class="progress" id="progress">未开始</div>
+  </header>
+
+  <div class="actions">
+    <button id="startBtn">创建测试</button>
+    <button id="submitBtn" class="secondary" disabled>提交</button>
+    <button id="resetBtn" class="danger" disabled>重新开始</button>
+  </div>
+
+  <div id="content">
+    <div class="empty">
+      点击「创建测试」随机生成 <strong>50</strong> 道题。<br />
+      每题给出一个英文单词，4 个中文选项中选出正确含义。
+    </div>
+  </div>
+</div>
+
+<script>
+const TEST_SIZE = 50;
+const OPTION_COUNT = 4;
+const VOCAB_URL = './vocab.json';
+
+const startBtn = document.getElementById('startBtn');
+const submitBtn = document.getElementById('submitBtn');
+const resetBtn = document.getElementById('resetBtn');
+const contentEl = document.getElementById('content');
+const progressEl = document.getElementById('progress');
+const metaEl = document.getElementById('meta');
+
+let vocab = [];
+let questions = [];
+let answers = [];
+
+async function loadVocab() {
+  if (vocab.length) return;
+  const res = await fetch(VOCAB_URL);
+  if (!res.ok) throw new Error('词库加载失败');
+  vocab = await res.json();
+  metaEl.textContent = `基于小学考纲词库 ${vocab.length} 词，随机抽取 ${TEST_SIZE} 题`;
+}
+
+function shuffle(arr) {
+  const copy = arr.slice();
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+function pickDistractors(correct, count) {
+  const pool = vocab.filter(item => item.meaning !== correct.meaning);
+  const used = new Set([correct.meaning]);
+  const picks = [];
+  const shuffled = shuffle(pool);
+  for (const item of shuffled) {
+    if (picks.length >= count) break;
+    if (used.has(item.meaning)) continue;
+    used.add(item.meaning);
+    picks.push(item.meaning);
+  }
+  return picks;
+}
+
+function buildQuestions() {
+  const sampled = shuffle(vocab).slice(0, TEST_SIZE);
+  return sampled.map((entry, index) => {
+    const distractors = pickDistractors(entry, OPTION_COUNT - 1);
+    const options = shuffle([entry.meaning, ...distractors]);
+    return {
+      index,
+      word: entry.word,
+      answer: entry.meaning,
+      options
+    };
+  });
+}
+
+function renderQuiz() {
+  const wrap = document.createElement('div');
+  wrap.className = 'quiz';
+
+  questions.forEach(q => {
+    const card = document.createElement('div');
+    card.className = 'question-card';
+
+    const head = document.createElement('div');
+    head.className = 'question-head';
+
+    const idx = document.createElement('span');
+    idx.className = 'question-index';
+    idx.textContent = `第 ${q.index + 1} 题 / ${questions.length}`;
+
+    const word = document.createElement('div');
+    word.className = 'question-word';
+    word.textContent = q.word;
+
+    head.append(word, idx);
+
+    const options = document.createElement('div');
+    options.className = 'options';
+
+    q.options.forEach((opt, optIdx) => {
+      const label = document.createElement('label');
+      label.className = 'option';
+      label.dataset.qi = String(q.index);
+      label.dataset.value = opt;
+
+      const marker = document.createElement('span');
+      marker.className = 'marker';
+      marker.textContent = String.fromCharCode(65 + optIdx);
+
+      const text = document.createElement('span');
+      text.textContent = opt;
+
+      const input = document.createElement('input');
+      input.type = 'radio';
+      input.name = `q-${q.index}`;
+      input.value = opt;
+      input.addEventListener('change', () => {
+        answers[q.index] = opt;
+        options.querySelectorAll('.option').forEach(el => {
+          el.classList.toggle('selected', el.dataset.value === opt);
+        });
+        updateProgress();
+      });
+
+      label.append(marker, text, input);
+      label.addEventListener('click', () => { input.checked = true; input.dispatchEvent(new Event('change')); });
+      options.appendChild(label);
+    });
+
+    card.append(head, options);
+    wrap.appendChild(card);
+  });
+
+  contentEl.innerHTML = '';
+  contentEl.appendChild(wrap);
+}
+
+function updateProgress() {
+  const answered = answers.filter(Boolean).length;
+  progressEl.textContent = `已答 ${answered} / ${questions.length}`;
+  submitBtn.disabled = answered === 0;
+}
+
+function startQuiz() {
+  questions = buildQuestions();
+  answers = new Array(questions.length).fill(null);
+  renderQuiz();
+  updateProgress();
+  startBtn.disabled = true;
+  resetBtn.disabled = false;
+  submitBtn.disabled = true;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function resetQuiz() {
+  questions = [];
+  answers = [];
+  contentEl.innerHTML = `
+    <div class="empty">
+      点击「创建测试」随机生成 <strong>${TEST_SIZE}</strong> 道题。<br />
+      每题给出一个英文单词，4 个中文选项中选出正确含义。
+    </div>`;
+  startBtn.disabled = false;
+  submitBtn.disabled = true;
+  resetBtn.disabled = true;
+  progressEl.textContent = '未开始';
+}
+
+function submitQuiz() {
+  const total = questions.length;
+  let correct = 0;
+  const wrongs = [];
+  questions.forEach((q, i) => {
+    const userAnswer = answers[i];
+    if (userAnswer === q.answer) {
+      correct += 1;
+    } else {
+      wrongs.push({ ...q, userAnswer });
+    }
+  });
+
+  const accuracy = Math.round((correct / total) * 100);
+
+  const summary = document.createElement('div');
+  summary.className = 'summary';
+
+  const head = document.createElement('div');
+  head.innerHTML = `
+    <div class="meta">本次成绩</div>
+    <div class="score">${correct} / ${total}</div>
+    <div class="desc">正确率 ${accuracy}%，共 ${total} 题，答对 ${correct} 题，答错 ${total - correct} 题。</div>
+  `;
+  summary.appendChild(head);
+
+  if (wrongs.length) {
+    const title = document.createElement('div');
+    title.className = 'meta';
+    title.style.marginTop = '14px';
+    title.textContent = '错题回顾';
+    summary.appendChild(title);
+
+    const list = document.createElement('div');
+    list.className = 'review-list';
+    wrongs.forEach(item => {
+      const row = document.createElement('div');
+      row.className = 'review-item wrong';
+      row.innerHTML = `
+        <div class="word">${item.word}</div>
+        <div class="line">你的答案：<span class="bad">${item.userAnswer || '未作答'}</span></div>
+        <div class="line">正确答案：<span class="ok">${item.answer}</span></div>
+      `;
+      list.appendChild(row);
+    });
+    summary.appendChild(list);
+  } else {
+    const ok = document.createElement('div');
+    ok.className = 'meta';
+    ok.style.marginTop = '8px';
+    ok.textContent = '全部答对，太棒了！';
+    summary.appendChild(ok);
+  }
+
+  const footer = document.createElement('div');
+  footer.className = 'footer-actions';
+  const again = document.createElement('button');
+  again.textContent = '再来一次';
+  again.addEventListener('click', startQuiz);
+  footer.appendChild(again);
+  summary.appendChild(footer);
+
+  contentEl.innerHTML = '';
+  contentEl.appendChild(summary);
+
+  submitBtn.disabled = true;
+  startBtn.disabled = false;
+  resetBtn.disabled = false;
+  progressEl.textContent = `已完成 ${correct}/${total}`;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+startBtn.addEventListener('click', async () => {
+  startBtn.disabled = true;
+  startBtn.textContent = '加载中...';
+  try {
+    await loadVocab();
+    startQuiz();
+  } catch (error) {
+    console.error(error);
+    contentEl.innerHTML = `<div class="empty">词库加载失败：${error.message}</div>`;
+    startBtn.disabled = false;
+  } finally {
+    startBtn.textContent = '创建测试';
+  }
+});
+
+submitBtn.addEventListener('click', () => {
+  const unanswered = answers.filter(a => !a).length;
+  if (unanswered > 0 && !confirm(`还有 ${unanswered} 题未作答，确认提交？`)) return;
+  submitQuiz();
+});
+
+resetBtn.addEventListener('click', resetQuiz);
+</script>
+</body>
+</html>

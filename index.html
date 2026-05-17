@@ -36,7 +36,7 @@
   aside {
     height: calc(100vh - 64px);
     display: grid;
-    grid-template-rows: repeat(2, minmax(0, 1fr));
+    grid-template-rows: minmax(0, 0.8fr) minmax(0, 1fr) minmax(0, 1fr);
     gap: 12px;
     padding: 12px;
     overflow: hidden;
@@ -84,10 +84,14 @@
     box-shadow: 0 8px 18px rgba(37, 99, 235, 0.24);
   }
   .child-section:nth-child(1) .side-title::before {
+    content: "公";
+    background: linear-gradient(135deg, #16a34a, #0ea5e9);
+  }
+  .child-section:nth-child(2) .side-title::before {
     content: "跃";
     background: linear-gradient(135deg, #2563eb, #7c3aed);
   }
-  .child-section:nth-child(2) .side-title::before {
+  .child-section:nth-child(3) .side-title::before {
     content: "晓";
     background: linear-gradient(135deg, #f97316, #ec4899);
   }
@@ -201,7 +205,8 @@
 </div>
 
 <script>
-const CHILD_ORDER = ['yuyue', 'yuxiao'];
+const COMMON_GROUP = { id: 'common', name: '公共' };
+const CHILD_ORDER = ['common', 'yuyue', 'yuxiao'];
 let children = [];
 const tasksByChild = {};
 let currentTaskKey = null;
@@ -215,12 +220,23 @@ async function apiGet(url) {
   return response.json();
 }
 
+async function loadGroupTasks(group) {
+  const url = group.id === 'common'
+    ? '/api/common/tasks'
+    : `/api/children/${encodeURIComponent(group.id)}/tasks`;
+  try {
+    tasksByChild[group.id] = await apiGet(url);
+  } catch (error) {
+    console.error(error);
+    tasksByChild[group.id] = [];
+  }
+}
+
 async function init() {
   try {
-    children = await apiGet('/api/children');
-    await Promise.all(children.map(async child => {
-      tasksByChild[child.id] = await apiGet(`/api/children/${encodeURIComponent(child.id)}/tasks`);
-    }));
+    const childList = await apiGet('/api/children');
+    children = [COMMON_GROUP, ...childList];
+    await Promise.all(children.map(loadGroupTasks));
     renderTaskNav();
     if (!openTaskFromUrl()) openFirstTask();
   } catch (error) {
@@ -273,7 +289,7 @@ function renderTaskNav() {
 
     const title = document.createElement('div');
     title.className = 'side-title';
-    title.textContent = `${child.name}的任务`;
+    title.textContent = child.id === 'common' ? '公共模块' : `${child.name}的任务`;
 
     const list = document.createElement('div');
     list.className = 'task-list';

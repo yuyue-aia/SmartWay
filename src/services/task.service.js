@@ -24,7 +24,12 @@ async function getTasks(childId) {
     .filter(task => task.id && task.name && task.entry);
 }
 
+async function getCommonTasks() {
+  return getTasks('common');
+}
+
 module.exports = {
   getTasks,
+  getCommonTasks,
   normalizeTaskEntry
 };

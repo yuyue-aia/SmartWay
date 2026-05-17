@@ -1,0 +1,10 @@
+[
+  {
+    "id": "word_test",
+    "name": "英语单词测试",
+    "type": "english",
+    "description": "随机抽取 50 个考纲单词进行选择题测试",
+    "entry": "./word-test/index.html",
+    "enabled": true
+  }
+]

@@ -6,6 +6,7 @@ const path = require('path');
 const config = require('./config');
 const healthRoutes = require('./routes/health.routes');
 const childrenRoutes = require('./routes/children.routes');
+const commonRoutes = require('./routes/common.routes');
 const githubRoutes = require('./routes/github.routes');
 const notFound = require('./middleware/not-found');
 const errorHandler = require('./middleware/error-handler');
@@ -20,6 +21,7 @@ app.use(express.json({ limit: '1mb' }));
 
 app.use('/api', healthRoutes);
 app.use('/api', childrenRoutes);
+app.use('/api', commonRoutes);
 app.use('/api', githubRoutes);
 
 app.get(['/', '/index.html'], (req, res) => {
