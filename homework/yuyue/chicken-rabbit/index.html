@@ -56,10 +56,10 @@
     <div>
       <div class="eyebrow">数学专项 · 鸡兔同笼</div>
       <h1 id="title">余跃 · 鸡兔同笼变式</h1>
-      <p class="subtitle">5 道鸡兔同笼经典变式题：标准型、自行车 / 三轮车、大船小船、答题扣分。每题答案均为整数，可口算。</p>
+      <p class="subtitle">10 道鸡兔同笼经典变式题：标准型、脚数差、头数差、自行车 / 三轮车、摩托车 / 汽车、大船小船、蜘蛛蜻蜓、答题扣分、邮票面值。每题答案均为整数，可口算。</p>
     </div>
     <div class="score-card">
-      <div class="score-number" id="score">0/5</div>
+      <div class="score-number" id="score">0/10</div>
       <div class="score-label">当前得分</div>
     </div>
   </section>
@@ -78,7 +78,7 @@
   <section class="bottom-actions">
     <div class="save-status" id="saveStatus"></div>
     <div class="actions">
-      <button class="btn btn-primary" id="checkBtn">批改</button>
+      <button class="btn btn-primary" id="checkBtn">全部提交</button>
       <button class="btn btn-secondary" id="resetBtn">重做</button>
       <button class="btn btn-secondary" id="saveBtn" disabled>保存成绩</button>
     </div>
@@ -92,38 +92,73 @@ const config = {
   questions: [
     {
       tag: '标准型',
-      prompt: '笼子里有鸡和兔共 35 只，从下面数共有 94 只脚。鸡和兔各有多少只？',
+      prompt: '笼子里有鸡和兔共 28 只，从下面数共有 76 只脚。鸡和兔各有多少只？',
       labels: ['鸡', '兔'],
       units: ['只', '只'],
-      answer: { 0: 23, 1: 12 }
+      answer: { 0: 18, 1: 10 }
     },
     {
       tag: '标准型',
-      prompt: '笼子里有鸡和兔共 20 只，一共 56 只脚。鸡和兔各有多少只？',
+      prompt: '笼子里有鸡和兔共 16 只，一共 44 只脚。鸡和兔各有多少只？',
       labels: ['鸡', '兔'],
       units: ['只', '只'],
-      answer: { 0: 12, 1: 8 }
+      answer: { 0: 10, 1: 6 }
+    },
+    {
+      tag: '脚数差',
+      prompt: '笼子里有鸡和兔共 26 只，兔的脚比鸡的脚多 20 只。鸡和兔各有多少只？',
+      labels: ['鸡', '兔'],
+      units: ['只', '只'],
+      answer: { 0: 14, 1: 12 }
+    },
+    {
+      tag: '头数差',
+      prompt: '笼子里鸡比兔多 8 只，鸡和兔的脚一共有 28 只。鸡和兔各有多少只？',
+      labels: ['鸡', '兔'],
+      units: ['只', '只'],
+      answer: { 0: 10, 1: 2 }
     },
     {
       tag: '自行车 / 三轮车',
-      prompt: '车棚里停着自行车和三轮车一共 18 辆，所有车的轮子总共 46 个。自行车和三轮车各有多少辆？',
+      prompt: '车棚里停着自行车和三轮车一共 20 辆，所有车的轮子总共 50 个。自行车和三轮车各有多少辆？',
       labels: ['自行车', '三轮车'],
       units: ['辆', '辆'],
-      answer: { 0: 8, 1: 10 }
+      answer: { 0: 10, 1: 10 }
+    },
+    {
+      tag: '摩托车 / 汽车',
+      prompt: '停车场上摩托车和汽车一共 18 辆，所有车的轮子总共 60 个（摩托车 2 个轮，汽车 4 个轮）。摩托车和汽车各有多少辆？',
+      labels: ['摩托车', '汽车'],
+      units: ['辆', '辆'],
+      answer: { 0: 6, 1: 12 }
     },
     {
       tag: '大船小船',
-      prompt: '同学们划船春游，大船每条坐 10 人，小船每条坐 6 人。大、小船共 12 条，刚好坐了 80 人，没有空位。大船和小船各有多少条？',
+      prompt: '同学们划船春游，大船每条坐 8 人，小船每条坐 5 人。大、小船共 14 条，刚好坐了 100 人，没有空位。大船和小船各有多少条？',
       labels: ['大船', '小船'],
       units: ['条', '条'],
-      answer: { 0: 2, 1: 10 }
+      answer: { 0: 10, 1: 4 }
+    },
+    {
+      tag: '蜘蛛 / 蜻蜓',
+      prompt: '蜘蛛和蜻蜓一共 12 只，它们的脚一共有 86 只（蜘蛛 8 只脚，蜻蜓 6 只脚）。蜘蛛和蜻蜓各有多少只？',
+      labels: ['蜘蛛', '蜻蜓'],
+      units: ['只', '只'],
+      answer: { 0: 7, 1: 5 }
     },
     {
       tag: '答题扣分',
-      prompt: '一次比赛共 20 道题，答对 1 题得 5 分，答错或不答倒扣 2 分。小明全部作答，最终得 79 分。他答对了多少题？答错了多少题？',
+      prompt: '一次比赛共 20 道题，答对 1 题得 5 分，答错或不答倒扣 3 分。小明全部作答，最终得 60 分。他答对和答错各多少题？',
       labels: ['答对', '答错'],
       units: ['题', '题'],
-      answer: { 0: 17, 1: 3 }
+      answer: { 0: 15, 1: 5 }
+    },
+    {
+      tag: '邮票面值',
+      prompt: '小明买了面值 0.5 元和 1.5 元的两种邮票一共 30 张，共付 25 元。0.5 元和 1.5 元的邮票各买了多少张？',
+      labels: ['0.5 元', '1.5 元'],
+      units: ['张', '张'],
+      answer: { 0: 20, 1: 10 }
     }
   ]
 };
@@ -237,30 +272,47 @@ function renderQuestions() {
   });
 }
 
+function clearAllFeedback() {
+  questionGridEl.querySelectorAll('.question-card').forEach(card => {
+    card.classList.remove('correct', 'wrong');
+    card.querySelector('.feedback').textContent = '';
+  });
+}
+
 function checkAll() {
   saveAnswers();
-  let correct = 0;
-  let answered = 0;
-  const wrongItems = [];
 
-  questionGridEl.querySelectorAll('.question-card').forEach(card => {
+  // 全部填写校验：每题的所有输入框都必须有值，才允许批改
+  const cards = [...questionGridEl.querySelectorAll('.question-card')];
+  const incomplete = [];
+  cards.forEach(card => {
+    const index = Number(card.dataset.index);
+    const inputs = card.querySelectorAll('.answer-input');
+    const values = [...inputs].map(input => normalizeAnswer(input.value));
+    if (values.some(v => !v)) incomplete.push(index + 1);
+  });
+
+  if (incomplete.length) {
+    clearAllFeedback();
+    scoreEl.textContent = `0/${config.questions.length}`;
+    saveBtn.disabled = true;
+    saveStatusEl.textContent = `还有 ${incomplete.length} 道题未完整填写（第 ${incomplete.join('、')} 题），全部填完才能批改`;
+    return;
+  }
+
+  // 全部填完，统一批改
+  let correct = 0;
+  const wrongItems = [];
+  cards.forEach(card => {
     const index = Number(card.dataset.index);
     const question = config.questions[index];
     const inputs = card.querySelectorAll('.answer-input');
     const feedback = card.querySelector('.feedback');
     const values = [...inputs].map(input => normalizeAnswer(input.value));
 
-    if (values.every(v => !v)) {
-      card.classList.remove('correct', 'wrong');
-      feedback.textContent = '';
-      return;
-    }
-
-    answered += 1;
     const ok = values.every((v, i) => isCorrectAnswer(v, question.answer[i]));
     card.classList.toggle('correct', ok);
     card.classList.toggle('wrong', !ok);
-
     if (ok) {
       correct += 1;
       feedback.textContent = '正确';
@@ -270,10 +322,11 @@ function checkAll() {
     }
   });
 
-  lastResult = { correct, total: answered, wrongItems };
-  scoreEl.textContent = `${correct}/${answered}`;
-  saveBtn.disabled = answered === 0;
-  saveStatusEl.textContent = answered === 0 ? '还没有填写答案' : `已批改 ${answered} 道题，可保存成绩`;
+  const total = config.questions.length;
+  lastResult = { correct, total, wrongItems };
+  scoreEl.textContent = `${correct}/${total}`;
+  saveBtn.disabled = false;
+  saveStatusEl.textContent = `已批改 ${total} 道题，答对 ${correct} 题，可保存成绩`;
 }
 
 function resetAll() {
