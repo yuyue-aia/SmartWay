@@ -30,5 +30,13 @@
     "description": "5 道进制转换 + 5 道相遇追及",
     "entry": "./mixed-practice/index.html",
     "enabled": true
+  },
+  {
+    "id": "chicken_rabbit",
+    "name": "鸡兔同笼变式",
+    "type": "math",
+    "description": "5 道鸡兔同笼变式题",
+    "entry": "./chicken-rabbit/index.html",
+    "enabled": true
   }
 ]
