@@ -52,7 +52,7 @@
     <div>
       <div class="eyebrow">数学专项 · 排列组合</div>
       <h1 id="title">余跃 · 排列组合</h1>
-      <p class="subtitle">5 道排列题 + 5 道组合题。先想一想：和顺序有关 → 排列；和顺序无关 → 组合。每题答案都是整数，可以用枚举或乘法算出来。</p>
+      <p class="subtitle">10 道题混合在一起，先想一想每题"换顺序算不算新方法"，再决定用排列还是组合。每题答案都是整数。</p>
     </div>
     <div class="score-card">
       <div class="score-number" id="score">0/10</div>
@@ -87,81 +87,61 @@ const config = {
   taskId: 'permutation_combination',
   questions: [
     {
-      tag: '排列',
-      kind: 'perm',
-      prompt: '一条铁路线上有 5 个车站，从任意一站到另一站都要印一种车票（去和回是不同的车票）。这条铁路一共要印多少种不同的车票？',
-      unit: '种',
-      answer: 20
-    },
-    {
-      tag: '排列',
-      kind: 'perm',
-      prompt: '4 个小朋友排成一排照相，一共有多少种不同的排法？',
-      unit: '种',
-      answer: 24
-    },
-    {
-      tag: '排列',
-      kind: 'perm',
-      prompt: '用 1、2、3、4 这 4 个数字（每个最多用 1 次），可以组成多少个没有重复数字的三位数？',
-      unit: '个',
-      answer: 24
-    },
-    {
-      tag: '排列',
-      kind: 'perm',
-      prompt: '5 名同学进行 60 米比赛。比赛前预测谁是第 1 名、谁是第 2 名，一共可以写出多少种不同的预测？',
-      unit: '种',
-      answer: 20
-    },
-    {
-      tag: '排列',
-      kind: 'perm',
-      prompt: '有红、黄、蓝、绿 4 种颜色的小旗各一面，任取 2 面分上、下挂在旗杆上表示信号（上下不同算不同信号）。一共可以表示多少种不同的信号？',
-      unit: '种',
-      answer: 12
-    },
-    {
-      tag: '组合',
-      kind: 'combo',
-      prompt: '从 6 名同学中选 2 名一起去参加文艺活动（两个人地位相同）。一共有多少种不同的选法？',
-      unit: '种',
+      prompt: '6 个好朋友见面，每两个人都要互相握一次手。一共握了多少次手？',
+      unit: '次',
       answer: 15
     },
     {
-      tag: '组合',
-      kind: 'combo',
-      prompt: '一次足球友谊赛有 5 个队参加，比赛采用单循环制（每两个队都要赛一场）。一共要进行多少场比赛？',
-      unit: '场',
-      answer: 10
-    },
-    {
-      tag: '组合',
-      kind: 'combo',
-      prompt: '班里今天有 8 名同学到校，老师要从中挑出 2 人值日（两人地位相同）。一共有多少种不同的挑法？',
+      prompt: '有红、黄、蓝、白 4 种颜色的小旗各一面，任取 3 面分上、中、下挂在旗杆上作信号（上下顺序不同算不同信号）。一共可以表示多少种不同的信号？',
       unit: '种',
-      answer: 28
+      answer: 24
     },
     {
-      tag: '组合',
-      kind: 'combo',
-      prompt: '平面上有 7 个点，任意三点都不在同一条直线上。以这些点为端点，最多可以画出多少条不同的线段？',
-      unit: '条',
+      prompt: '从 8 名同学中挑选 3 人加入合唱团（3 个人地位相同，不分先后）。一共有多少种不同的挑法？',
+      unit: '种',
+      answer: 56
+    },
+    {
+      prompt: '一条公交线路上有 6 个车站，从任意一站到另一站都要印一种车票（去和回是不同的车票）。这条线路一共要印多少种不同的车票？',
+      unit: '种',
+      answer: 30
+    },
+    {
+      prompt: '果篮里有苹果、香蕉、橘子等 7 种不同的水果，妈妈要从中挑出 2 种榨果汁（先后顺序无所谓）。一共有多少种不同的挑法？',
+      unit: '种',
       answer: 21
     },
     {
-      tag: '组合',
-      kind: 'combo',
-      prompt: '合唱队有 10 名同学，老师要从中挑选 3 人组成一个小组参加比赛（3 人不分先后）。一共有多少种不同的挑选方法？',
+      prompt: '把字母 a、b、c、d、e 中任取 3 个，排成一行（如 acb、bca 算两种）。一共可以排出多少种不同的结果？',
       unit: '种',
-      answer: 120
+      answer: 60
+    },
+    {
+      prompt: '一次篮球邀请赛有 9 个队参加，比赛采用单循环制（每两个队都要赛一场）。一共要进行多少场比赛？',
+      unit: '场',
+      answer: 36
+    },
+    {
+      prompt: '4 个小朋友排成一排合影。规定小明必须站在最左边，其他 3 人随便站。一共有多少种不同的站法？',
+      unit: '种',
+      answer: 6
+    },
+    {
+      prompt: '平面上有 6 个点，任意 3 个点都不在同一条直线上。以这些点为端点，最多可以画出多少条不同的线段？',
+      unit: '条',
+      answer: 15
+    },
+    {
+      prompt: '用 1、2、3、4 这 4 个数字（每个最多用 1 次），可以组成多少个没有重复数字的两位数？',
+      unit: '个',
+      answer: 12
     }
   ]
 };
 
 const stateKey = `smartway.permutationCombination.${config.childId}.answers`;
 const questionSignature = JSON.stringify(config.questions.map(q => ({
-  tag: q.tag, prompt: q.prompt, answer: q.answer
+  prompt: q.prompt, answer: q.answer
 })));
 let lastResult = null;
 
@@ -220,11 +200,7 @@ function renderQuestions() {
     num.className = 'question-index';
     num.textContent = `第 ${index + 1} 题`;
 
-    const badge = document.createElement('div');
-    badge.className = `badge ${question.kind}`;
-    badge.textContent = question.tag;
-
-    head.append(num, badge);
+    head.append(num);
 
     const prompt = document.createElement('div');
     prompt.className = 'prompt';
