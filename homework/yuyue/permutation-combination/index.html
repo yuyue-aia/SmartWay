@@ -240,24 +240,37 @@ function renderQuestions() {
 
 function checkAll() {
   saveAnswers();
+
+  const cards = [...questionGridEl.querySelectorAll('.question-card')];
+  const unfilled = [];
+  cards.forEach(card => {
+    const index = Number(card.dataset.index);
+    const input = card.querySelector('.answer-input');
+    const value = normalizeAnswer(input.value);
+    if (!value) unfilled.push(index + 1);
+  });
+
+  if (unfilled.length > 0) {
+    saveStatusEl.textContent = `还有 ${unfilled.length} 道题未作答（第 ${unfilled.join('、')} 题），全部填完才能提交批改`;
+    const firstUnfilled = cards.find(card => Number(card.dataset.index) + 1 === unfilled[0]);
+    if (firstUnfilled) {
+      firstUnfilled.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const input = firstUnfilled.querySelector('.answer-input');
+      if (input) input.focus();
+    }
+    return;
+  }
+
   let correct = 0;
-  let answered = 0;
   const wrongItems = [];
 
-  questionGridEl.querySelectorAll('.question-card').forEach(card => {
+  cards.forEach(card => {
     const index = Number(card.dataset.index);
     const question = config.questions[index];
     const input = card.querySelector('.answer-input');
     const feedback = card.querySelector('.feedback');
     const value = normalizeAnswer(input.value);
 
-    if (!value) {
-      card.classList.remove('correct', 'wrong');
-      feedback.textContent = '';
-      return;
-    }
-
-    answered += 1;
     const ok = isCorrectAnswer(value, question.answer);
     card.classList.toggle('correct', ok);
     card.classList.toggle('wrong', !ok);
@@ -271,10 +284,11 @@ function checkAll() {
     }
   });
 
-  lastResult = { correct, total: answered, wrongItems };
-  scoreEl.textContent = `${correct}/${answered}`;
-  saveBtn.disabled = answered === 0;
-  saveStatusEl.textContent = answered === 0 ? '还没有填写答案' : `已批改 ${answered} 道题，可保存成绩`;
+  const total = cards.length;
+  lastResult = { correct, total, wrongItems };
+  scoreEl.textContent = `${correct}/${total}`;
+  saveBtn.disabled = false;
+  saveStatusEl.textContent = `已批改 ${total} 道题，可保存成绩`;
 }
 
 function resetAll() {
