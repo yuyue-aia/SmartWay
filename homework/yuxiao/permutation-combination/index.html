@@ -52,7 +52,7 @@
     <div>
       <div class="eyebrow">数学专项 · 排列组合</div>
       <h1 id="title">余跃 · 排列组合</h1>
-      <p class="subtitle">5 道排列题 + 5 道组合题。先想一想：和顺序有关 → 排列；和顺序无关 → 组合。每题答案均为整数。</p>
+      <p class="subtitle">10 道题混合在一起，全部答完再点"提交批改"。提交之前不会告诉你某题对错，提交之后会一次性显示对错。每题答案都是整数。</p>
     </div>
     <div class="score-card">
       <div class="score-number" id="score">0/10</div>
@@ -74,7 +74,7 @@
   <section class="bottom-actions">
     <div class="save-status" id="saveStatus"></div>
     <div class="actions">
-      <button class="btn btn-primary" id="checkBtn">批改</button>
+      <button class="btn btn-primary" id="checkBtn">提交批改</button>
       <button class="btn btn-secondary" id="resetBtn">重做</button>
       <button class="btn btn-secondary" id="saveBtn" disabled>保存成绩</button>
     </div>
@@ -87,81 +87,61 @@ const config = {
   taskId: 'permutation_combination',
   questions: [
     {
-      tag: '排列',
-      kind: 'perm',
-      prompt: '一条铁路线上有 8 个车站，从任意一站到另一站都要印一种车票（去和回是不同的车票）。这条铁路一共要印多少种不同的车票？',
-      unit: '种',
-      answer: 56
-    },
-    {
-      tag: '排列',
-      kind: 'perm',
-      prompt: '老师和 4 个同学共 5 人排成一排照相，老师必须站在正中间。一共有多少种不同的站法？',
-      unit: '种',
-      answer: 24
-    },
-    {
-      tag: '排列',
-      kind: 'perm',
-      prompt: '用 0、1、2、3、4 这 5 个数字，可以组成多少个没有重复数字的三位数？（百位不能是 0）',
-      unit: '个',
-      answer: 48
-    },
-    {
-      tag: '排列',
-      kind: 'perm',
-      prompt: '6 名同学进行 100 米决赛。比赛前预测冠军、亚军、季军这 3 个名次的不同名单，一共可以写出多少种？',
-      unit: '种',
-      answer: 120
-    },
-    {
-      tag: '排列',
-      kind: 'perm',
-      prompt: '有红、黄、蓝、绿、紫 5 种颜色的旗子各一面，任取 3 面挂在旗杆上排成一行表示一种信号。一共可以表示多少种不同的信号？',
+      prompt: '一家小餐馆今天提供 5 种不同的凉菜、4 种不同的热菜和 3 种不同的汤。余晓要点一份凉菜、一份热菜和一份汤，组成一份套餐。一共可以点出多少种不同的套餐？',
       unit: '种',
       answer: 60
     },
     {
-      tag: '组合',
-      kind: 'combo',
-      prompt: '从 9 名同学中选 2 名一起去参加文艺活动（两人地位相同）。一共有多少种不同的选法？',
-      unit: '种',
-      answer: 36
+      prompt: '六（1）班共 12 名同学，今天要每两人合拍一张合影留念。一共要拍多少张不同的合影？',
+      unit: '张',
+      answer: 66
     },
     {
-      tag: '组合',
-      kind: 'combo',
-      prompt: '一次足球邀请赛有 8 个队参加，比赛采用单循环制（每两个队都要赛一场）。一共要进行多少场比赛？',
-      unit: '场',
+      prompt: '余晓手里有数字卡片 0、2、4、6、8 各一张。从中任取 3 张摆成一个三位数（每张卡最多用一次，最高位不能是 0）。一共可以摆出多少个不同的三位数？',
+      unit: '个',
+      answer: 48
+    },
+    {
+      prompt: '奶茶店里有 9 种不同口味的奶茶。妈妈想从中挑出 3 种一起带去聚会（3 杯一起放在同一个袋子里）。一共有多少种不同的挑法？',
+      unit: '种',
+      answer: 84
+    },
+    {
+      prompt: '老师手里有 6 本不同的故事书，要发给 4 个同学，每人 1 本，并且每人拿到的书都不一样。一共有多少种不同的发法？',
+      unit: '种',
+      answer: 360
+    },
+    {
+      prompt: '平面上有 8 个点，任意 3 个点都不在同一条直线上。以这些点为端点，最多可以画出多少条不同的线段？',
+      unit: '条',
       answer: 28
     },
     {
-      tag: '组合',
-      kind: 'combo',
-      prompt: '六（1）班共 10 名同学报名，要从中选出 3 人去打扫教室。一共有多少种不同的选法？',
+      prompt: '3 个男生和 2 个女生排成一排合影。规定 2 个女生必须紧挨着站在一起（女生内部谁左谁右算不同站法）。一共有多少种不同的站法？',
       unit: '种',
-      answer: 120
+      answer: 48
     },
     {
-      tag: '组合',
-      kind: 'combo',
-      prompt: '平面上有 7 个点，任意三点都不在同一条直线上。以这些点为端点，最多可以画出多少条不同的线段？',
-      unit: '条',
-      answer: 21
-    },
-    {
-      tag: '组合',
-      kind: 'combo',
-      prompt: '合唱队有 12 名同学，老师要从中挑选 4 人组成一个小组参加比赛（4 人不分先后）。一共有多少种不同的挑选方法？',
+      prompt: '合唱队有 12 名同学，老师要从中挑选 4 人组成一个小组参加比赛（4 人地位相同，没有先后之分）。一共有多少种不同的挑选方法？',
       unit: '种',
       answer: 495
+    },
+    {
+      prompt: '一个游戏关卡的密码是从数字 1~7 中任选 3 个不同的数字，按一定顺序输入组成的（数字前后位置不同算不同密码）。最多可以设出多少种不同的密码？',
+      unit: '种',
+      answer: 210
+    },
+    {
+      prompt: '体育课上，老师把 10 名同学分成两组：选 3 人参加跳绳比赛，剩下 7 人去打篮球（同一组内不分先后）。问跳绳组一共有多少种不同的选法？',
+      unit: '种',
+      answer: 120
     }
   ]
 };
 
 const stateKey = `smartway.permutationCombination.${config.childId}.answers`;
 const questionSignature = JSON.stringify(config.questions.map(q => ({
-  tag: q.tag, prompt: q.prompt, answer: q.answer
+  prompt: q.prompt, answer: q.answer
 })));
 let lastResult = null;
 
@@ -220,11 +200,7 @@ function renderQuestions() {
     num.className = 'question-index';
     num.textContent = `第 ${index + 1} 题`;
 
-    const badge = document.createElement('div');
-    badge.className = `badge ${question.kind}`;
-    badge.textContent = question.tag;
-
-    head.append(num, badge);
+    head.append(num);
 
     const prompt = document.createElement('div');
     prompt.className = 'prompt';
@@ -264,24 +240,37 @@ function renderQuestions() {
 
 function checkAll() {
   saveAnswers();
+
+  const cards = [...questionGridEl.querySelectorAll('.question-card')];
+  const unfilled = [];
+  cards.forEach(card => {
+    const index = Number(card.dataset.index);
+    const input = card.querySelector('.answer-input');
+    const value = normalizeAnswer(input.value);
+    if (!value) unfilled.push(index + 1);
+  });
+
+  if (unfilled.length > 0) {
+    saveStatusEl.textContent = `还有 ${unfilled.length} 道题未作答（第 ${unfilled.join('、')} 题），全部填完才能提交批改`;
+    const firstUnfilled = cards.find(card => Number(card.dataset.index) + 1 === unfilled[0]);
+    if (firstUnfilled) {
+      firstUnfilled.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const input = firstUnfilled.querySelector('.answer-input');
+      if (input) input.focus();
+    }
+    return;
+  }
+
   let correct = 0;
-  let answered = 0;
   const wrongItems = [];
 
-  questionGridEl.querySelectorAll('.question-card').forEach(card => {
+  cards.forEach(card => {
     const index = Number(card.dataset.index);
     const question = config.questions[index];
     const input = card.querySelector('.answer-input');
     const feedback = card.querySelector('.feedback');
     const value = normalizeAnswer(input.value);
 
-    if (!value) {
-      card.classList.remove('correct', 'wrong');
-      feedback.textContent = '';
-      return;
-    }
-
-    answered += 1;
     const ok = isCorrectAnswer(value, question.answer);
     card.classList.toggle('correct', ok);
     card.classList.toggle('wrong', !ok);
@@ -295,10 +284,11 @@ function checkAll() {
     }
   });
 
-  lastResult = { correct, total: answered, wrongItems };
-  scoreEl.textContent = `${correct}/${answered}`;
-  saveBtn.disabled = answered === 0;
-  saveStatusEl.textContent = answered === 0 ? '还没有填写答案' : `已批改 ${answered} 道题，可保存成绩`;
+  const total = cards.length;
+  lastResult = { correct, total, wrongItems };
+  scoreEl.textContent = `${correct}/${total}`;
+  saveBtn.disabled = false;
+  saveStatusEl.textContent = `已批改 ${total} 道题，可保存成绩`;
 }
 
 function resetAll() {
