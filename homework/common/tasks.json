@@ -6,5 +6,13 @@
     "description": "随机抽取 50 个考纲单词进行选择题测试",
     "entry": "./word-test/index.html",
     "enabled": true
+  },
+  {
+    "id": "permutation_combination_lesson",
+    "name": "排列组合图解课",
+    "type": "lesson",
+    "description": "用小球、握手图直观讲解排列与组合的区别",
+    "entry": "./permutation-combination-lesson/index.html",
+    "enabled": true
   }
 ]

@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>排列与组合 · 图解课</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    color: #1f2937;
+    background: linear-gradient(180deg, #f0f7ff 0%, #fdf4ff 100%);
+    min-height: 100vh;
+    padding: 24px 16px 80px;
+    line-height: 1.7;
+  }
+  .page {
+    max-width: 920px;
+    margin: 0 auto;
+    display: grid;
+    gap: 22px;
+  }
+  /* --- 标题 --- */
+  .hero {
+    padding: 26px 24px;
+    border-radius: 22px;
+    color: #fff;
+    background: linear-gradient(135deg, #2563eb, #7c3aed 60%, #ec4899);
+    box-shadow: 0 18px 40px rgba(124, 58, 237, 0.28);
+  }
+  .hero .eyebrow {
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    opacity: 0.85;
+    margin-bottom: 6px;
+  }
+  .hero h1 { font-size: 28px; line-height: 1.25; margin-bottom: 8px; }
+  .hero p { font-size: 15px; opacity: 0.95; }
+
+  /* --- 卡片 --- */
+  .card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 22px;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+  }
+  h2 {
+    font-size: 20px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #0f172a;
+  }
+  h2 .num {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    color: #fff;
+    display: grid; place-items: center;
+    font-size: 15px; font-weight: 800;
+  }
+  h3 { font-size: 16px; margin: 14px 0 8px; color: #1e3a8a; }
+  p { color: #334155; font-size: 15px; }
+  .hint {
+    background: linear-gradient(135deg, #fef3c7, #fef9c3);
+    border-left: 4px solid #f59e0b;
+    padding: 12px 14px;
+    border-radius: 10px;
+    color: #78350f;
+    font-size: 14px;
+    margin-top: 12px;
+  }
+  .key {
+    background: linear-gradient(135deg, #dbeafe, #ede9fe);
+    border-left: 4px solid #2563eb;
+    padding: 12px 14px;
+    border-radius: 10px;
+    color: #1e3a8a;
+    font-size: 14px;
+    margin-top: 12px;
+  }
+
+  /* --- 小球（实物图示） --- */
+  .balls {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 12px 0;
+  }
+  .ball {
+    width: 54px; height: 54px;
+    border-radius: 50%;
+    display: grid; place-items: center;
+    color: #fff;
+    font-size: 20px;
+    font-weight: 800;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.15);
+  }
+  .ball.A { background: linear-gradient(135deg, #ef4444, #f97316); }
+  .ball.B { background: linear-gradient(135deg, #eab308, #facc15); color: #78350f;}
+  .ball.C { background: linear-gradient(135deg, #22c55e, #10b981); }
+  .ball.D { background: linear-gradient(135deg, #3b82f6, #6366f1); }
+
+  /* --- 枚举行 --- */
+  .enum-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 10px;
+    margin: 12px 0;
+  }
+  .enum-item {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    border-radius: 14px;
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    font-weight: 700;
+    color: #1e293b;
+  }
+  .enum-item .ball { width: 32px; height: 32px; font-size: 14px; }
+  .arrow {
+    color: #94a3b8;
+    font-weight: 800;
+  }
+
+  /* --- 对比表 --- */
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 12px;
+  }
+  .compare > div {
+    border-radius: 16px;
+    padding: 16px;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+  }
+  .compare .perm-side {
+    background: linear-gradient(135deg, #fff1f2, #ffe4e6);
+    border-color: #fecaca;
+  }
+  .compare .combo-side {
+    background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+    border-color: #a7f3d0;
+  }
+  .compare h4 {
+    font-size: 15px;
+    margin-bottom: 8px;
+  }
+  .compare .perm-side h4 { color: #b91c1c; }
+  .compare .combo-side h4 { color: #047857; }
+
+  /* --- 公式 --- */
+  .formula {
+    display: inline-block;
+    background: #0f172a;
+    color: #fef9c3;
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-family: "Courier New", monospace;
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    margin: 6px 0;
+  }
+  .formula .small { font-size: 12px; opacity: 0.8; }
+
+  /* --- 步骤盒 --- */
+  .steps {
+    display: grid;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .step {
+    display: grid;
+    grid-template-columns: 36px 1fr;
+    gap: 12px;
+    align-items: start;
+    padding: 12px;
+    border-radius: 14px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+  }
+  .step .step-num {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: #2563eb;
+    color: #fff;
+    display: grid; place-items: center;
+    font-weight: 800;
+    font-size: 14px;
+  }
+
+  /* --- 互动按钮 --- */
+  .quiz {
+    margin-top: 14px;
+    padding: 16px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #fdf2f8, #f0f9ff);
+    border: 1px dashed #c7d2fe;
+  }
+  .quiz .question { font-weight: 800; color: #1e3a8a; margin-bottom: 10px; }
+  .options {
+    display: flex; gap: 8px; flex-wrap: wrap;
+  }
+  .opt {
+    cursor: pointer;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: #fff;
+    border: 2px solid #cbd5e1;
+    font-weight: 700;
+    font-size: 14px;
+    color: #334155;
+    transition: all 0.18s;
+  }
+  .opt:hover { border-color: #2563eb; color: #2563eb; }
+  .opt.right { background: #dcfce7; border-color: #16a34a; color: #166534; }
+  .opt.wrong { background: #fee2e2; border-color: #dc2626; color: #991b1b; }
+  .feedback {
+    margin-top: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    min-height: 22px;
+  }
+  .feedback.ok { color: #16a34a; }
+  .feedback.no { color: #dc2626; }
+
+  /* --- 握手图 --- */
+  svg.handshake {
+    width: 100%;
+    max-width: 360px;
+    display: block;
+    margin: 12px auto;
+  }
+
+  /* --- 决策流程 --- */
+  .flow {
+    display: grid;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .flow-step {
+    padding: 14px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #eef2ff, #f0fdf4);
+    border-left: 4px solid #6366f1;
+    font-size: 15px;
+    color: #1e293b;
+  }
+  .flow-step b { color: #4338ca; }
+
+  ul.bullet { margin-left: 18px; margin-top: 6px; }
+  ul.bullet li { margin-bottom: 4px; color: #334155; font-size: 14px; }
+
+  /* --- 总结表 --- */
+  table.summary {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+    font-size: 14px;
+  }
+  table.summary th, table.summary td {
+    border: 1px solid #e2e8f0;
+    padding: 10px 12px;
+    text-align: left;
+  }
+  table.summary th {
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    color: #fff;
+    font-weight: 800;
+  }
+  table.summary tr:nth-child(even) { background: #f8fafc; }
+
+  @media (max-width: 640px) {
+    .compare { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <section class="hero">
+    <div class="eyebrow">数学小课堂</div>
+    <h1>排列 vs 组合 · 一看就懂</h1>
+    <p>用 4 个彩色小球，5 分钟搞清楚什么时候用排列、什么时候用组合。</p>
+  </section>
+
+  <!-- 1. 引入故事 -->
+  <section class="card">
+    <h2><span class="num">1</span>先看一个小问题</h2>
+    <p>桌上有 4 个不同颜色的小球：</p>
+    <div class="balls">
+      <div class="ball A">红</div>
+      <div class="ball B">黄</div>
+      <div class="ball C">绿</div>
+      <div class="ball D">蓝</div>
+    </div>
+    <p>从这 4 个小球里 <b>选 2 个</b>，会有几种结果？</p>
+    <div class="hint">看似简单，但答案不止一个！要看你怎么"选"——是 <b>排队</b> 还是 <b>放进一个袋子</b>。这就是排列和组合的区别。</div>
+  </section>
+
+  <!-- 2. 排列 -->
+  <section class="card">
+    <h2><span class="num">2</span>情况一：排成一排（排列）</h2>
+    <p>把选出来的 2 个球，<b>一前一后摆好</b>。比如挂上旗杆当信号——上面一个、下面一个。</p>
+    <p><b>红黄</b> 和 <b>黄红</b> 算同一种吗？</p>
+    <div class="hint">不算！位置变了，信号就不一样。所以"红黄"和"黄红"要算 <b>两种</b>。</div>
+
+    <h3>把所有结果都列出来：</h3>
+    <div class="enum-grid" id="permList"></div>
+    <p style="margin-top:8px;">数一数：一共 <b style="color:#dc2626;font-size:18px;">12</b> 种。</p>
+
+    <h3>怎么算出来的？</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div><b>第一个位置</b>有几种选法？4 种（红黄绿蓝任选）。</div></div>
+      <div class="step"><div class="step-num">2</div><div><b>第二个位置</b>呢？只剩 3 个球可选，所以 3 种。</div></div>
+      <div class="step"><div class="step-num">3</div><div>每一种"第一个"都能搭配 3 种"第二个"，所以一共 <b>4 × 3 = 12</b> 种。</div></div>
+    </div>
+    <div class="formula">A(4, 2) = 4 × 3 = 12</div>
+    <div class="key">📌 <b>排列</b>：从 n 个里选 m 个 <b>排成一排</b>，结果 = <b>n × (n−1) × … × (n−m+1)</b>（一共乘 m 个数，从 n 开始往下数）</div>
+  </section>
+
+  <!-- 3. 组合 -->
+  <section class="card">
+    <h2><span class="num">3</span>情况二：放进口袋（组合）</h2>
+    <p>这次不排队，把选出来的 2 个球 <b>一起塞进一个口袋</b>。</p>
+    <p><b>{红, 黄}</b> 和 <b>{黄, 红}</b> 还算两种吗？</p>
+    <div class="hint">不算了！口袋里两个球没有顺序，"红黄"和"黄红"是 <b>同一袋</b>。</div>
+
+    <h3>把所有结果列出来：</h3>
+    <div class="enum-grid" id="comboList"></div>
+    <p style="margin-top:8px;">数一数：只有 <b style="color:#16a34a;font-size:18px;">6</b> 种。</p>
+
+    <h3>怎么从 12 变成 6 的？</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div>排列结果是 12 种（每对都被算了 2 次：{红,黄} 既算了"红黄"也算了"黄红"）。</div></div>
+      <div class="step"><div class="step-num">2</div><div>2 个球能排成 <b>2 × 1 = 2</b> 种顺序，所以每对都被多数了 2 次。</div></div>
+      <div class="step"><div class="step-num">3</div><div>真实的种数 = <b>12 ÷ 2 = 6</b>。</div></div>
+    </div>
+    <div class="formula">C(4, 2) = (4 × 3) ÷ (2 × 1) = 6</div>
+    <div class="key">📌 <b>组合</b>：从 n 个里选 m 个 <b>不分顺序</b>，结果 = <b>排列结果 ÷ (m × (m−1) × … × 1)</b></div>
+  </section>
+
+  <!-- 4. 一图看懂区别 -->
+  <section class="card">
+    <h2><span class="num">4</span>一图看懂区别</h2>
+    <div class="compare">
+      <div class="perm-side">
+        <h4>🏃 排列（顺序重要）</h4>
+        <p>像 <b>排队</b>、<b>站成一行</b>、<b>分名次</b>。</p>
+        <ul class="bullet">
+          <li>跑步比赛冠亚季军</li>
+          <li>用数字组三位数</li>
+          <li>站在不同位置照相</li>
+          <li>火车站之间的车票（去/回不同）</li>
+        </ul>
+      </div>
+      <div class="combo-side">
+        <h4>🎒 组合（顺序不重要）</h4>
+        <p>像 <b>装袋子</b>、<b>选小组</b>、<b>互相握手</b>。</p>
+        <ul class="bullet">
+          <li>从全班里选 3 人值日</li>
+          <li>两人握手</li>
+          <li>几个点连成的线段</li>
+          <li>球队两两单循环比赛</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. 经典例题：握手 -->
+  <section class="card">
+    <h2><span class="num">5</span>经典例：5 个人握手几次？</h2>
+    <p>5 个朋友见面，每两个人都要握一次手，一共握多少次？</p>
+
+    <svg class="handshake" viewBox="0 0 300 300">
+      <!-- 5 个圆点等距放在圆周 -->
+      <g id="dots" stroke="#fff" stroke-width="3" fill="#2563eb"></g>
+      <g id="lines" stroke="#94a3b8" stroke-width="1.5" fill="none"></g>
+      <g id="labels" font-size="14" font-weight="800" fill="#0f172a"></g>
+    </svg>
+
+    <p style="text-align:center;color:#64748b;font-size:13px;">每两点之间画一条线，数一数有 <b>10</b> 条。</p>
+
+    <h3>怎么列式？</h3>
+    <p>这是"两两配对"，<b>甲握乙</b> 和 <b>乙握甲</b> 是同一次握手 → <b>组合</b>。</p>
+    <div class="formula">C(5, 2) = (5 × 4) ÷ (2 × 1) = 10</div>
+    <div class="hint">如果题目改成"5 个人比赛 100 米，预测前两名"，那就是 <b>排列</b>，因为"小明第 1、小红第 2"和"小红第 1、小明第 2"算两种不同的预测。<br>答案：A(5, 2) = 5 × 4 = 20。</div>
+  </section>
+
+  <!-- 6. 决策流程 -->
+  <section class="card">
+    <h2><span class="num">6</span>遇到题目怎么判断？</h2>
+    <div class="flow">
+      <div class="flow-step">第 1 步：找出"被选"和"选几个"。<br><b>例：</b>"从 8 人选 3 人组队"——被选 8 人，选 3 个。</div>
+      <div class="flow-step">第 2 步：问自己关键一句——<br>👉 <b>"换个顺序"算不算新方法？</b></div>
+      <div class="flow-step">第 3 步：判断<br>✅ 算新方法 → <b>排列</b>（A 公式：n × (n−1) × … 共 m 项）<br>✅ 不算新方法 → <b>组合</b>（C 公式：排列结果 ÷ m!）</div>
+    </div>
+  </section>
+
+  <!-- 7. 互动小测 -->
+  <section class="card">
+    <h2><span class="num">7</span>来做 3 道小判断 🎯</h2>
+    <p>判断下面每题用 <b style="color:#b91c1c;">排列</b> 还是 <b style="color:#047857;">组合</b>：</p>
+
+    <div class="quiz" data-answer="排列">
+      <div class="question">Q1. 6 名同学比赛跑步，预测前 3 名的名次。</div>
+      <div class="options">
+        <button class="opt" data-pick="排列">排列</button>
+        <button class="opt" data-pick="组合">组合</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <div class="quiz" data-answer="组合">
+      <div class="question">Q2. 班里 10 人，选 2 人去帮老师搬书。</div>
+      <div class="options">
+        <button class="opt" data-pick="排列">排列</button>
+        <button class="opt" data-pick="组合">组合</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <div class="quiz" data-answer="组合">
+      <div class="question">Q3. 8 个球队进行单循环比赛，每两队赛一场，问一共多少场。</div>
+      <div class="options">
+        <button class="opt" data-pick="排列">排列</button>
+        <button class="opt" data-pick="组合">组合</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <div class="quiz" data-answer="排列">
+      <div class="question">Q4. 用 0、1、2、3 这 4 个数字组成没有重复数字的三位数。</div>
+      <div class="options">
+        <button class="opt" data-pick="排列">排列</button>
+        <button class="opt" data-pick="组合">组合</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+  </section>
+
+  <!-- 8. 总结 -->
+  <section class="card">
+    <h2><span class="num">8</span>一张表带走</h2>
+    <table class="summary">
+      <thead>
+        <tr><th>对比项</th><th>排列 A(n, m)</th><th>组合 C(n, m)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>看不看顺序</td><td>看</td><td>不看</td></tr>
+        <tr><td>常见情境</td><td>排队、名次、车票、组数字</td><td>选代表、握手、连线段、单循环</td></tr>
+        <tr><td>计算公式</td><td>n × (n−1) × … 共 m 个</td><td>排列结果 ÷ (m × (m−1) × … × 1)</td></tr>
+        <tr><td>例子（4 选 2）</td><td>4 × 3 = 12</td><td>12 ÷ 2 = 6</td></tr>
+      </tbody>
+    </table>
+    <div class="key">🎯 一句话记住：<b>排列看顺序，组合不看顺序</b>。先按排列算出来，"不看顺序"就再除掉重复。</div>
+  </section>
+
+</div>
+
+<script>
+// 1) 渲染排列枚举（4 选 2 排列共 12 个）
+const colors = [
+  { key: 'A', name: '红' },
+  { key: 'B', name: '黄' },
+  { key: 'C', name: '绿' },
+  { key: 'D', name: '蓝' }
+];
+
+function ballHTML(color) {
+  return `<span class="ball ${color.key}">${color.name}</span>`;
+}
+
+const permListEl = document.getElementById('permList');
+for (const a of colors) {
+  for (const b of colors) {
+    if (a.key === b.key) continue;
+    permListEl.insertAdjacentHTML('beforeend',
+      `<div class="enum-item">${ballHTML(a)}<span class="arrow">→</span>${ballHTML(b)}</div>`);
+  }
+}
+
+// 2) 渲染组合枚举（4 选 2 组合共 6 个）
+const comboListEl = document.getElementById('comboList');
+for (let i = 0; i < colors.length; i++) {
+  for (let j = i + 1; j < colors.length; j++) {
+    comboListEl.insertAdjacentHTML('beforeend',
+      `<div class="enum-item">${ballHTML(colors[i])}${ballHTML(colors[j])}</div>`);
+  }
+}
+
+// 3) 握手图：5 点 + 所有连线
+(function drawHandshake() {
+  const dots = document.getElementById('dots');
+  const lines = document.getElementById('lines');
+  const labels = document.getElementById('labels');
+  const cx = 150, cy = 150, r = 110;
+  const n = 5;
+  const points = [];
+  for (let i = 0; i < n; i++) {
+    const angle = -Math.PI / 2 + (i * 2 * Math.PI) / n;
+    points.push({ x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle) });
+  }
+  // 先画线
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.setAttribute('x1', points[i].x);
+      line.setAttribute('y1', points[i].y);
+      line.setAttribute('x2', points[j].x);
+      line.setAttribute('y2', points[j].y);
+      lines.appendChild(line);
+    }
+  }
+  // 再画点
+  points.forEach((p, idx) => {
+    const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    c.setAttribute('cx', p.x); c.setAttribute('cy', p.y); c.setAttribute('r', 14);
+    dots.appendChild(c);
+
+    const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    t.setAttribute('x', p.x);
+    t.setAttribute('y', p.y + 5);
+    t.setAttribute('text-anchor', 'middle');
+    t.setAttribute('fill', '#fff');
+    t.textContent = String(idx + 1);
+    labels.appendChild(t);
+  });
+})();
+
+// 4) 互动小测
+document.querySelectorAll('.quiz').forEach(quiz => {
+  const answer = quiz.dataset.answer;
+  const fb = quiz.querySelector('.feedback');
+  quiz.querySelectorAll('.opt').forEach(btn => {
+    btn.addEventListener('click', () => {
+      quiz.querySelectorAll('.opt').forEach(b => b.classList.remove('right', 'wrong'));
+      const ok = btn.dataset.pick === answer;
+      btn.classList.add(ok ? 'right' : 'wrong');
+      fb.className = 'feedback ' + (ok ? 'ok' : 'no');
+      fb.textContent = ok ? '✅ 答对啦！' : `❌ 再想想，关键看顺序换了算不算新方法。正确答案是「${answer}」。`;
+    });
+  });
+});
+</script>
+</body>
+</html>
