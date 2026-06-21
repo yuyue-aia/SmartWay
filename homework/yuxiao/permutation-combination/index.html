@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>余跃 · 排列组合</title>
+<link rel="stylesheet" href="/shared/base-conversion-task.css" />
+<style>
+  .formula-card {
+    display: grid;
+    gap: 6px;
+    width: 100%;
+    padding: 16px;
+    border: 1px solid rgba(37, 99, 235, 0.18);
+    border-radius: 18px;
+    background: linear-gradient(135deg, #eff6ff, #f8fafc);
+    color: #334155;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+  .formula-title { color: #1d4ed8; font-weight: 900; }
+  .question-card { min-height: 220px; }
+  .prompt { min-height: 110px; line-height: 1.8; }
+  .answer-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .answer-row label {
+    font-size: 13px;
+    color: #475569;
+    font-weight: 800;
+  }
+  .answer-input { width: 100%; }
+  .unit {
+    display: inline-flex;
+    align-items: center;
+    padding: 0 10px;
+    border-radius: 12px;
+    background: #e0e7ff;
+    color: #3730a3;
+    font-weight: 900;
+    font-size: 13px;
+  }
+  .badge.combo { background: #dcfce7; color: #166534; }
+  .badge.perm { background: #fee2e2; color: #b91c1c; }
+</style>
+</head>
+<body>
+<div class="page">
+  <section class="hero">
+    <div>
+      <div class="eyebrow">数学专项 · 排列组合</div>
+      <h1 id="title">余跃 · 排列组合</h1>
+      <p class="subtitle">5 道排列题 + 5 道组合题。先想一想：和顺序有关 → 排列；和顺序无关 → 组合。每题答案均为整数。</p>
+    </div>
+    <div class="score-card">
+      <div class="score-number" id="score">0/10</div>
+      <div class="score-label">当前得分</div>
+    </div>
+  </section>
+
+  <section class="toolbar">
+    <div class="formula-card">
+      <div class="formula-title">解题提醒</div>
+      <div>① <b>排列（与顺序有关）</b>：从 n 个里取 m 个排成一列 = n × (n−1) × … × (n−m+1)。例：A(5,3)=5×4×3=60。</div>
+      <div>② <b>组合（与顺序无关）</b>：先按排列算，再除以 m! 去掉重复。例：C(5,3)=5×4×3 ÷ (3×2×1)=10。</div>
+      <div>③ 判断窍门：换位置后是否算"新的方案"——算 → 排列；不算 → 组合。比赛名次/排队/三位数 → 排列；选代表/握手/连线段 → 组合。</div>
+    </div>
+  </section>
+
+  <section class="question-grid" id="questionGrid"></section>
+
+  <section class="bottom-actions">
+    <div class="save-status" id="saveStatus"></div>
+    <div class="actions">
+      <button class="btn btn-primary" id="checkBtn">批改</button>
+      <button class="btn btn-secondary" id="resetBtn">重做</button>
+      <button class="btn btn-secondary" id="saveBtn" disabled>保存成绩</button>
+    </div>
+  </section>
+</div>
+
+<script>
+const config = {
+  childId: 'yuxiao',
+  taskId: 'permutation_combination',
+  questions: [
+    {
+      tag: '排列',
+      kind: 'perm',
+      prompt: '一条铁路线上有 8 个车站，从任意一站到另一站都要印一种车票（去和回是不同的车票）。这条铁路一共要印多少种不同的车票？',
+      unit: '种',
+      answer: 56
+    },
+    {
+      tag: '排列',
+      kind: 'perm',
+      prompt: '老师和 4 个同学共 5 人排成一排照相，老师必须站在正中间。一共有多少种不同的站法？',
+      unit: '种',
+      answer: 24
+    },
+    {
+      tag: '排列',
+      kind: 'perm',
+      prompt: '用 0、1、2、3、4 这 5 个数字，可以组成多少个没有重复数字的三位数？（百位不能是 0）',
+      unit: '个',
+      answer: 48
+    },
+    {
+      tag: '排列',
+      kind: 'perm',
+      prompt: '6 名同学进行 100 米决赛。比赛前预测冠军、亚军、季军这 3 个名次的不同名单，一共可以写出多少种？',
+      unit: '种',
+      answer: 120
+    },
+    {
+      tag: '排列',
+      kind: 'perm',
+      prompt: '有红、黄、蓝、绿、紫 5 种颜色的旗子各一面，任取 3 面挂在旗杆上排成一行表示一种信号。一共可以表示多少种不同的信号？',
+      unit: '种',
+      answer: 60
+    },
+    {
+      tag: '组合',
+      kind: 'combo',
+      prompt: '从 9 名同学中选 2 名一起去参加文艺活动（两人地位相同）。一共有多少种不同的选法？',
+      unit: '种',
+      answer: 36
+    },
+    {
+      tag: '组合',
+      kind: 'combo',
+      prompt: '一次足球邀请赛有 8 个队参加，比赛采用单循环制（每两个队都要赛一场）。一共要进行多少场比赛？',
+      unit: '场',
+      answer: 28
+    },
+    {
+      tag: '组合',
+      kind: 'combo',
+      prompt: '六（1）班共 10 名同学报名，要从中选出 3 人去打扫教室。一共有多少种不同的选法？',
+      unit: '种',
+      answer: 120
+    },
+    {
+      tag: '组合',
+      kind: 'combo',
+      prompt: '平面上有 7 个点，任意三点都不在同一条直线上。以这些点为端点，最多可以画出多少条不同的线段？',
+      unit: '条',
+      answer: 21
+    },
+    {
+      tag: '组合',
+      kind: 'combo',
+      prompt: '合唱队有 12 名同学，老师要从中挑选 4 人组成一个小组参加比赛（4 人不分先后）。一共有多少种不同的挑选方法？',
+      unit: '种',
+      answer: 495
+    }
+  ]
+};
+
+const stateKey = `smartway.permutationCombination.${config.childId}.answers`;
+const questionSignature = JSON.stringify(config.questions.map(q => ({
+  tag: q.tag, prompt: q.prompt, answer: q.answer
+})));
+let lastResult = null;
+
+const questionGridEl = document.getElementById('questionGrid');
+const scoreEl = document.getElementById('score');
+const checkBtn = document.getElementById('checkBtn');
+const resetBtn = document.getElementById('resetBtn');
+const saveBtn = document.getElementById('saveBtn');
+const saveStatusEl = document.getElementById('saveStatus');
+
+function loadAnswers() {
+  try {
+    const saved = JSON.parse(sessionStorage.getItem(stateKey) || 'null');
+    if (!saved || saved.signature !== questionSignature || !Array.isArray(saved.answers)) {
+      sessionStorage.removeItem(stateKey);
+      return [];
+    }
+    return saved.answers;
+  } catch (error) {
+    sessionStorage.removeItem(stateKey);
+    return [];
+  }
+}
+
+function saveAnswers() {
+  const answers = [...questionGridEl.querySelectorAll('.question-card')].map(card => {
+    const input = card.querySelector('.answer-input');
+    return input ? input.value : '';
+  });
+  sessionStorage.setItem(stateKey, JSON.stringify({ signature: questionSignature, answers }));
+  saveStatusEl.textContent = '答案已自动保留';
+}
+
+function normalizeAnswer(value) {
+  return String(value || '').trim().replace(/[^0-9.\-]/g, '');
+}
+
+function isCorrectAnswer(inputValue, expected) {
+  const num = Number(normalizeAnswer(inputValue));
+  return Number.isFinite(num) && Math.abs(num - expected) < 1e-8;
+}
+
+function renderQuestions() {
+  const savedAnswers = loadAnswers();
+  questionGridEl.innerHTML = '';
+
+  config.questions.forEach((question, index) => {
+    const card = document.createElement('article');
+    card.className = 'question-card';
+    card.dataset.index = index;
+
+    const head = document.createElement('div');
+    head.className = 'question-head';
+
+    const num = document.createElement('div');
+    num.className = 'question-index';
+    num.textContent = `第 ${index + 1} 题`;
+
+    const badge = document.createElement('div');
+    badge.className = `badge ${question.kind}`;
+    badge.textContent = question.tag;
+
+    head.append(num, badge);
+
+    const prompt = document.createElement('div');
+    prompt.className = 'prompt';
+    prompt.textContent = question.prompt;
+
+    const answerRow = document.createElement('div');
+    answerRow.className = 'answer-row';
+
+    const lab = document.createElement('label');
+    lab.textContent = '答：';
+
+    const input = document.createElement('input');
+    input.className = 'answer-input';
+    input.type = 'text';
+    input.inputMode = 'numeric';
+    input.placeholder = '请输入整数';
+    input.autocomplete = 'off';
+    input.value = savedAnswers[index] || '';
+    input.addEventListener('input', saveAnswers);
+    input.addEventListener('keydown', event => {
+      if (event.key === 'Enter') checkAll();
+    });
+
+    const unit = document.createElement('span');
+    unit.className = 'unit';
+    unit.textContent = question.unit;
+
+    answerRow.append(lab, input, unit);
+
+    const feedback = document.createElement('div');
+    feedback.className = 'feedback';
+
+    card.append(head, prompt, answerRow, feedback);
+    questionGridEl.appendChild(card);
+  });
+}
+
+function checkAll() {
+  saveAnswers();
+  let correct = 0;
+  let answered = 0;
+  const wrongItems = [];
+
+  questionGridEl.querySelectorAll('.question-card').forEach(card => {
+    const index = Number(card.dataset.index);
+    const question = config.questions[index];
+    const input = card.querySelector('.answer-input');
+    const feedback = card.querySelector('.feedback');
+    const value = normalizeAnswer(input.value);
+
+    if (!value) {
+      card.classList.remove('correct', 'wrong');
+      feedback.textContent = '';
+      return;
+    }
+
+    answered += 1;
+    const ok = isCorrectAnswer(value, question.answer);
+    card.classList.toggle('correct', ok);
+    card.classList.toggle('wrong', !ok);
+
+    if (ok) {
+      correct += 1;
+      feedback.textContent = '正确';
+    } else {
+      feedback.textContent = '错误';
+      wrongItems.push(`第 ${index + 1} 题：${question.prompt}`);
+    }
+  });
+
+  lastResult = { correct, total: answered, wrongItems };
+  scoreEl.textContent = `${correct}/${answered}`;
+  saveBtn.disabled = answered === 0;
+  saveStatusEl.textContent = answered === 0 ? '还没有填写答案' : `已批改 ${answered} 道题，可保存成绩`;
+}
+
+function resetAll() {
+  lastResult = null;
+  sessionStorage.removeItem(stateKey);
+  scoreEl.textContent = `0/${config.questions.length}`;
+  saveBtn.disabled = true;
+  saveStatusEl.textContent = '';
+  questionGridEl.querySelectorAll('.question-card').forEach(card => {
+    card.classList.remove('correct', 'wrong');
+    const input = card.querySelector('.answer-input');
+    if (input) input.value = '';
+    card.querySelector('.feedback').textContent = '';
+  });
+}
+
+async function saveResult() {
+  if (!lastResult) return;
+  saveBtn.disabled = true;
+  saveStatusEl.textContent = '正在保存...';
+
+  try {
+    const response = await fetch(`/api/children/${encodeURIComponent(config.childId)}/records`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        taskId: config.taskId,
+        total: lastResult.total,
+        correct: lastResult.correct,
+        wrongItems: lastResult.wrongItems
+      })
+    });
+    if (!response.ok) throw new Error(`保存失败：${response.status}`);
+    saveStatusEl.textContent = '成绩已保存';
+  } catch (error) {
+    console.error(error);
+    saveStatusEl.textContent = '保存失败，请确认后端服务正常';
+    saveBtn.disabled = false;
+  }
+}
+
+checkBtn.addEventListener('click', checkAll);
+resetBtn.addEventListener('click', resetAll);
+saveBtn.addEventListener('click', saveResult);
+
+renderQuestions();
+scoreEl.textContent = `0/${config.questions.length}`;
+if (loadAnswers().some(Boolean)) {
+  saveStatusEl.textContent = '已恢复上次填写的答案';
+}
+</script>
+</body>
+</html>

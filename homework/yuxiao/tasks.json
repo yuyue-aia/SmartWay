@@ -38,5 +38,13 @@
     "description": "5 道鸡兔同笼变式题",
     "entry": "./chicken-rabbit/index.html",
     "enabled": true
+  },
+  {
+    "id": "permutation_combination",
+    "name": "排列组合",
+    "type": "math",
+    "description": "5 道排列 + 5 道组合，共 10 题",
+    "entry": "./permutation-combination/index.html",
+    "enabled": true
   }
 ]
